@@ -1,0 +1,31 @@
+version: '3.4'
+
+services:
+  frontend:
+    image: ${DOCKER_REGISTRY-}frontend
+    container_name: ocp10_frontend
+    build:
+      context: .
+      dockerfile: Frontend/Dockerfile
+
+  patientservice:
+    image: ${DOCKER_REGISTRY-}patientservice
+    container_name: ocp10_patientservice
+    build:
+      context: .
+      dockerfile: PatientService/Dockerfile
+    ports:
+      - "5000:80"
+    environment:
+      ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=OCP10_Patient;User Id=sa;Password=YourP@ssword123!"
+    depends_on:
+      - patientdb
+
+  patientdb:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: ocp10_patientdb
+    ports:
+      - "1433:1433"
+    environment:
+      ACCEPT_EULA: "Y"
+      SA_PASSWORD: "YourP@ssword123!"
