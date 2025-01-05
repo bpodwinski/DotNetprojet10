@@ -29,13 +29,15 @@ services:
       dockerfile: PatientService/Dockerfile
     environment:
       ConnectionStrings__DefaultConnection: "Server=sqlserver,1433;Database=OCP10_Patient;User Id=sa;Password=YourP@ssword123!"
-      ASPNETCORE_ENVIRONMENT: "Development"
+      ASPNETCORE_ENVIRONMENT: "Docker"
     depends_on:
       - patientdb
 
   patientdb:
     image: mcr.microsoft.com/mssql/server:2022-latest
     container_name: ocp10_patientdb
+    ports:
+      - "1433:1433"
     environment:
       ACCEPT_EULA: "Y"
-      SA_PASSWORD: "YourP@ssword123!"
+      MSSQL_SA_PASSWORD: "YourP@ssword123!"
