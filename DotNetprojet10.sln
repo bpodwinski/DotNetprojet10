@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PatientService", "PatientSe
 EndProject
 Project("{E53339B2-1760-4266-BCC7-CA923CBCF16C}") = "docker-compose", "docker-compose.dcproj", "{2E260EDC-CF65-44DC-B9BB-40A235E1B387}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GatewayService", "GatewayService\GatewayService.csproj", "{C3875038-2172-4F7C-B81F-F225583DE78D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{2E260EDC-CF65-44DC-B9BB-40A235E1B387}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2E260EDC-CF65-44DC-B9BB-40A235E1B387}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2E260EDC-CF65-44DC-B9BB-40A235E1B387}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C3875038-2172-4F7C-B81F-F225583DE78D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C3875038-2172-4F7C-B81F-F225583DE78D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C3875038-2172-4F7C-B81F-F225583DE78D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C3875038-2172-4F7C-B81F-F225583DE78D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
