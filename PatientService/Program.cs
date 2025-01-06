@@ -7,7 +7,7 @@ var environment = builder.Environment.EnvironmentName;
 
 builder.Configuration
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    .AddJsonFile($"appsettings.{environment}.json", optional: true);
+    .AddJsonFile($"appsettings{environment}.json", optional: true);
 
 // Add services to the container.
 builder.Services.AddDbContext<LocalDbContext>(options =>
