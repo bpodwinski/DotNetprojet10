@@ -1,4 +1,5 @@
-﻿using NoteService.Domain;
+﻿using MongoDB.Bson;
+using NoteService.Domain;
 using NoteService.DTOs;
 using NoteService.Repositories;
 
@@ -72,20 +73,22 @@ namespace NoteService.Services
         }
 
         /// <summary>
-        /// Asynchronously retrieves a Note entity by its ID.
+        /// Asynchronously retrieves all Note entities for a specific Patient ID.
         /// </summary>
-        /// <param name="id">The ID of the Note to retrieve.</param>
-        /// <returns>The NoteDTO, or null if not found.</returns>
-        public async Task<NoteDTO?> GetByPatientId(int id)
+        /// <param name="id">The ID of the Patient whose notes are to be retrieved.</param>
+        /// <returns>A list of NoteDTOs, or an empty list if no notes are found.</returns>
+        public async Task<List<NoteDTO>> GetByPatientId(int id)
         {
             try
             {
-                var note = await _noteRepository.GetByPatientId(id);
-                return note is not null ? ToNoteDTO(note) : null;
+                var notes = await _noteRepository.GetByPatientId(id);
+                var noteDtos = notes.Select(ToNoteDTO).ToList();
+
+                return noteDtos;
             }
             catch (Exception ex)
             {
-                throw new Exception($"An error occurred while retrieving the Note with ID {id}.", ex);
+                throw new Exception($"An error occurred while retrieving notes for Patient ID {id}.", ex);
             }
         }
 

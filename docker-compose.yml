@@ -63,7 +63,7 @@ services:
       - notedb:/data/db
     environment:
       MONGO_INITDB_ROOT_USERNAME: "root"
-      MONGO_INITDB_ROOT_PASSWORD: "YourP@ssword123!"
+      MONGO_INITDB_ROOT_PASSWORD: "YourPassword123"
 
 volumes:
   mssql:

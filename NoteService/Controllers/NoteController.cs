@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Bson;
 using NoteService.DTOs;
 using NoteService.Services;
 
@@ -19,7 +20,7 @@ namespace NoteService.Controllers
         /// <response code="200">Returns the list of NoteDTOs</response>
         /// <response code="500">If an internal error occurs</response>
         [HttpGet]
-        [Authorize(policy: "User")]
+        //[Authorize(policy: "User")]
         [ProducesResponseType(typeof(List<NoteDTO>), 200)]
         [ProducesResponseType(500)]
         public async Task<IActionResult> GetAll()
@@ -46,7 +47,7 @@ namespace NoteService.Controllers
         /// <response code="404">If the Note with the specified ID is not found</response>
         /// <response code="500">If an internal error occurs</response>
         [HttpGet("id/{id}")]
-        [Authorize(policy: "User")]
+        //[Authorize(policy: "User")]
         [ProducesResponseType(typeof(NoteDTO), 200)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
@@ -73,36 +74,39 @@ namespace NoteService.Controllers
         }
 
         /// <summary>
-        /// Retrieves a specific Note by Patient ID.
+        /// Retrieves all Notes associated with a specific Patient ID.
         /// </summary>
-        /// <param name="id">The Patient ID of the Note to retrieve</param>
-        /// <returns>A NoteDTO corresponding to the Patient ID</returns>
-        /// <response code="200">Returns the NoteDTO</response>
-        /// <response code="404">If the Note with the specified Patient ID is not found</response>
-        /// <response code="500">If an internal error occurs</response>
+        /// <param name="id">The Patient ID of the Notes to retrieve.</param>
+        /// <returns>A list of NoteDTOs corresponding to the Patient ID.</returns>
+        /// <response code="200">Returns the list of NoteDTOs.</response>
+        /// <response code="404">If no Notes are found for the specified Patient ID.</response>
+        /// <response code="500">If an internal error occurs.</response>
         [HttpGet("patientid/{id}")]
-        [Authorize(policy: "User")]
-        [ProducesResponseType(typeof(NoteDTO), 200)]
+        //[Authorize(policy: "User")]
+        [ProducesResponseType(typeof(List<NoteDTO>), 200)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
         public async Task<IActionResult> GetByPatientId([FromRoute] int id)
         {
             try
             {
-                _logger.LogInformation("Fetching Note item with Patient ID {Id}.", id);
-                var note = await _noteService.GetByPatientId(id);
+                _logger.LogInformation("Fetching Note items for Patient ID {Id}.", id);
 
-                if (note is not null)
+                // Appeler le service pour récupérer les notes
+                var notes = await _noteService.GetByPatientId(id);
+
+                if (notes == null || notes.Count == 0)
                 {
-                    return Ok(note);
+                    _logger.LogWarning("No Note items found for Patient ID {Id}.", id);
+                    return NotFound($"No notes found for Patient ID {id}.");
                 }
 
-                _logger.LogWarning("Note item with Patient ID {Id} not found.", id);
-                return NotFound($"Note with Patient ID {id} not found.");
+                _logger.LogInformation("Successfully fetched {Count} Note items for Patient ID {Id}.", notes.Count, id);
+                return Ok(notes);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while fetching Note item with Patient ID {Id}.", id);
+                _logger.LogError(ex, "An error occurred while fetching Note items for Patient ID {Id}.", id);
                 return StatusCode(500, "An internal error occurred.");
             }
         }
@@ -116,7 +120,7 @@ namespace NoteService.Controllers
         /// <response code="400">If the model is invalid</response>
         /// <response code="500">If an internal error occurs</response>
         [HttpPost]
-        [Authorize(policy: "Admin")]
+        //[Authorize(policy: "Admin")]
         [ProducesResponseType(typeof(NoteDTO), 201)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]

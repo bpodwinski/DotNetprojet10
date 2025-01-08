@@ -1,4 +1,5 @@
-﻿using Swashbuckle.AspNetCore.Annotations;
+﻿using MongoDB.Bson;
+using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 
 namespace NoteService.DTOs
@@ -12,7 +13,7 @@ namespace NoteService.DTOs
         /// Gets or sets unique identifier note
         /// </summary>
         [SwaggerSchema(ReadOnly = true)]
-        public string Id { get; set; }
+        public string? Id { get; set; }
 
         /// <summary>
         /// Gets or sets unique identifier patient

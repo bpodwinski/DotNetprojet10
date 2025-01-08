@@ -34,7 +34,7 @@ namespace NoteService.Repositories
         /// </summary>
         /// <param name="id">The ID of the Note entity to retrieve.</param>
         /// <returns>A task representing the asynchronous operation. The result is the Note entity, or null if not found.</returns>
-        Task<NoteDomain?> GetByPatientId(int id);
+        Task<List<NoteDomain?>> GetByPatientId(int id);
 
         /// <summary>
         /// Retrieves all Note entities from the database.

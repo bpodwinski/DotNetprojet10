@@ -1,4 +1,5 @@
-﻿using NoteService.DTOs;
+﻿using MongoDB.Bson;
+using NoteService.DTOs;
 
 namespace NoteService.Services
 {
@@ -33,7 +34,7 @@ namespace NoteService.Services
         /// </summary>
         /// <param name="id">The ID of the Note to retrieve.</param>
         /// <returns>A task representing the asynchronous operation, with the NoteDTO, or null if not found.</returns>
-        Task<NoteDTO?> GetByPatientId(int id);
+        Task<List<NoteDTO?>> GetByPatientId(int id);
 
         /// <summary>
         /// Asynchronously retrieves all Note entities.

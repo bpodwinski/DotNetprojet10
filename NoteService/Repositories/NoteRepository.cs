@@ -1,4 +1,5 @@
-﻿using MongoDB.Driver;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
 using NoteService.Data;
 using NoteService.Domain;
 
@@ -96,25 +97,25 @@ namespace NoteService.Repositories
         /// </summary>
         /// <param name="id">The ID of the Note entity to retrieve.</param>
         /// <returns>The Note entity, or null if not found.</returns>
-        public async Task<NoteDomain?> GetByPatientId(int id)
+        public async Task<List<NoteDomain>> GetByPatientId(int id)
         {
             try
             {
-                var note = await _notesCollection.Find(note => note.PatientId == id).FirstOrDefaultAsync();
-                if (note == null)
+                var notes = await _notesCollection.Find(note => note.PatientId == id).ToListAsync();
+                if (notes.Count == 0)
                 {
-                    _logger.LogWarning("Note with ID {Id} was not found.", id);
+                    _logger.LogWarning("No notes found for PatientId {Id}.", id);
                 }
                 else
                 {
-                    _logger.LogInformation("Successfully retrieved Note with ID {Id}.", id);
+                    _logger.LogInformation("Successfully retrieved {Count} notes for PatientId {Id}.", notes.Count, id);
                 }
 
-                return note;
+                return notes;
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "An error occurred while retrieving Note with ID {Id}.", id);
+                _logger.LogError(ex, "An error occurred while retrieving notes for PatientId {Id}.", id);
                 throw;
             }
         }
