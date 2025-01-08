@@ -1,17 +1,5 @@
 ﻿[
   {
-    "DownstreamPathTemplate": "/swagger/{everything}",
-    "DownstreamScheme": "http",
-    "DownstreamHostAndPorts": [
-      {
-        "Host": "patientservice",
-        "Port": 8080
-      }
-    ],
-    "UpstreamPathTemplate": "/patients/swagger/{everything}",
-    "UpstreamHttpMethod": [ "GET" ]
-  },
-  {
     "DownstreamPathTemplate": "/api/patients",
     "DownstreamScheme": "http",
     "DownstreamHostAndPorts": [

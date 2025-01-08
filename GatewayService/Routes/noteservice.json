@@ -5,11 +5,35 @@
     "DownstreamHostAndPorts": [
       {
         "Host": "noteservice",
-        "Port": 8081
+        "Port": 8080
       }
     ],
     "UpstreamPathTemplate": "/notes",
-    "UpstreamHttpMethod": [ "GET", "POST" ]
+    "UpstreamHttpMethod": [ "POST" ]
+  },
+  {
+    "DownstreamPathTemplate": "/api/notes/id/{id}",
+    "DownstreamScheme": "http",
+    "DownstreamHostAndPorts": [
+      {
+        "Host": "noteservice",
+        "Port": 8080
+      }
+    ],
+    "UpstreamPathTemplate": "/notes/id/{id}",
+    "UpstreamHttpMethod": [ "GET" ]
+  },
+  {
+    "DownstreamPathTemplate": "/api/notes/patientid/{id}",
+    "DownstreamScheme": "http",
+    "DownstreamHostAndPorts": [
+      {
+        "Host": "noteservice",
+        "Port": 8080
+      }
+    ],
+    "UpstreamPathTemplate": "/notes/patientid/{id}",
+    "UpstreamHttpMethod": [ "GET" ]
   },
   {
     "DownstreamPathTemplate": "/api/notes/{id}",
@@ -17,7 +41,7 @@
     "DownstreamHostAndPorts": [
       {
         "Host": "noteservice",
-        "Port": 8081
+        "Port": 8080
       }
     ],
     "UpstreamPathTemplate": "/notes/{id}",

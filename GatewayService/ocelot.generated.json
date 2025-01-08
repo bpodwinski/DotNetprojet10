@@ -6,13 +6,40 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "noteservice",
-          "Port": 8081
+          "Port": 8080
         }
       ],
       "UpstreamPathTemplate": "/notes",
       "UpstreamHttpMethod": [
-        "GET",
         "POST"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/notes/id/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "noteservice",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/notes/id/{id}",
+      "UpstreamHttpMethod": [
+        "GET"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/notes/patientid/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "noteservice",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/notes/patientid/{id}",
+      "UpstreamHttpMethod": [
+        "GET"
       ]
     },
     {
@@ -21,7 +48,7 @@
       "DownstreamHostAndPorts": [
         {
           "Host": "noteservice",
-          "Port": 8081
+          "Port": 8080
         }
       ],
       "UpstreamPathTemplate": "/notes/{id}",
@@ -29,20 +56,6 @@
         "GET",
         "PUT",
         "DELETE"
-      ]
-    },
-    {
-      "DownstreamPathTemplate": "/swagger/{everything}",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "patientservice",
-          "Port": 8080
-        }
-      ],
-      "UpstreamPathTemplate": "/patients/swagger/{everything}",
-      "UpstreamHttpMethod": [
-        "GET"
       ]
     },
     {
