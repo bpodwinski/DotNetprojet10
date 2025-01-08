@@ -8,9 +8,12 @@ services:
       - "5000:5000"
     depends_on:
       - patientservice
+      - noteservice
     environment:
       ASPNETCORE_ENVIRONMENT: "Development"
       ASPNETCORE_HTTP_PORTS: "5000"
+    networks:
+      - ocp10_network
 
   frontend:
     image: ${DOCKER_REGISTRY-}frontend
@@ -20,6 +23,8 @@ services:
       dockerfile: Frontend/Dockerfile
     volumes:
       - keys:/keys
+    networks:
+      - ocp10_network
 
   patientservice:
     image: ${DOCKER_REGISTRY-}patientservice
@@ -31,6 +36,8 @@ services:
       ASPNETCORE_ENVIRONMENT: "Docker"
     depends_on:
       - patientdb
+    networks:
+      - ocp10_network
 
   patientdb:
     image: mcr.microsoft.com/mssql/server:2022-latest
@@ -42,9 +49,11 @@ services:
     environment:
       ACCEPT_EULA: "Y"
       MSSQL_SA_PASSWORD: "YourP@ssword123!"
+    networks:
+      - ocp10_network
 
   noteservice:
-    image: ${DOCKER_REGISTRY-}ocp10_noteservice
+    image: ${DOCKER_REGISTRY-}noteservice
     container_name: ocp10_noteservice
     build:
       context: .
@@ -53,6 +62,8 @@ services:
       ASPNETCORE_ENVIRONMENT: "Docker"
     depends_on:
       - notedb
+    networks:
+      - ocp10_network
 
   notedb:
     image: mongo:latest
@@ -64,8 +75,14 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: "root"
       MONGO_INITDB_ROOT_PASSWORD: "YourPassword123"
+    networks:
+      - ocp10_network
 
 volumes:
   mssql:
   notedb:
   keys:
+  
+networks:
+  ocp10_network:
+    driver: bridge
