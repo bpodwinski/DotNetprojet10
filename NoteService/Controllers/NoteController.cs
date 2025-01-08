@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Bson;
 using NoteService.DTOs;
 using NoteService.Services;
 
@@ -12,31 +11,6 @@ namespace NoteService.Controllers
     {
         private readonly INoteService _noteService = noteService;
         private readonly ILogger<NoteController> _logger = logger;
-
-        /// <summary>
-        /// Retrieves all Note items.
-        /// </summary>
-        /// <returns>A list of NoteDTOs</returns>
-        /// <response code="200">Returns the list of NoteDTOs</response>
-        /// <response code="500">If an internal error occurs</response>
-        [HttpGet]
-        [Authorize(policy: "User")]
-        [ProducesResponseType(typeof(List<NoteDTO>), 200)]
-        [ProducesResponseType(500)]
-        public async Task<IActionResult> GetAll()
-        {
-            try
-            {
-                _logger.LogInformation("Fetching all Note items.");
-                var notes = await _noteService.GetAll();
-                return Ok(notes);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "An error occurred while fetching Note items.");
-                return StatusCode(500, "An internal error occurred.");
-            }
-        }
 
         /// <summary>
         /// Retrieves a specific Note by ID.
@@ -82,7 +56,7 @@ namespace NoteService.Controllers
         /// <response code="404">If no Notes are found for the specified Patient ID.</response>
         /// <response code="500">If an internal error occurs.</response>
         [HttpGet("patientid/{id}")]
-        [Authorize(policy: "User")]
+        //[Authorize(policy: "User")]
         [ProducesResponseType(typeof(List<NoteDTO>), 200)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]

@@ -13,11 +13,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Load configuration files
 ConfigurationManager configuration = builder.Configuration;
-var environment = builder.Environment.EnvironmentName;
 
+var environment = builder.Environment.EnvironmentName;
 builder.Configuration
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    .AddJsonFile($"appsettings.{environment}.json", optional: true);
+    .AddJsonFile($"appsettings{environment}.json", optional: true);
 
 // Configure Serilog for logging
 Log.Logger = new LoggerConfiguration()
