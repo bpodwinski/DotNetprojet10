@@ -1,4 +1,4 @@
-Ddiagramme représentant l'architecture de l'application :
+Diagramme représentant l'architecture de l'application :
 ```mermaid
 	graph TD;
 	Ocelot[[Ocelot Gateway]]  -->  PatientService[Backend: Patient API]
