@@ -1,0 +1,97 @@
+{
+  "Routes": [
+    {
+      "DownstreamPathTemplate": "/api/notes",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "noteservice",
+          "Port": 8081
+        }
+      ],
+      "UpstreamPathTemplate": "/notes",
+      "UpstreamHttpMethod": [
+        "GET",
+        "POST"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/notes/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "noteservice",
+          "Port": 8081
+        }
+      ],
+      "UpstreamPathTemplate": "/notes/{id}",
+      "UpstreamHttpMethod": [
+        "GET",
+        "PUT",
+        "DELETE"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/swagger/{everything}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "patientservice",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/patients/swagger/{everything}",
+      "UpstreamHttpMethod": [
+        "GET"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/patients",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "patientservice",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/patients",
+      "UpstreamHttpMethod": [
+        "GET",
+        "POST"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/api/patients/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "patientservice",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/patients/{id}",
+      "UpstreamHttpMethod": [
+        "GET",
+        "PUT",
+        "DELETE"
+      ]
+    },
+    {
+      "DownstreamPathTemplate": "/auth/login",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "patientservice",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/auth/login",
+      "UpstreamHttpMethod": [
+        "POST"
+      ]
+    }
+  ],
+  "GlobalConfiguration": {
+    "BaseUrl": "http://localhost:5000"
+  }
+}

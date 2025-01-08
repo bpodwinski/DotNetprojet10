@@ -43,6 +43,29 @@ services:
       ACCEPT_EULA: "Y"
       MSSQL_SA_PASSWORD: "YourP@ssword123!"
 
+  noteservice:
+    image: ${DOCKER_REGISTRY-}ocp10_noteservice
+    container_name: ocp10_noteservice
+    build:
+      context: .
+      dockerfile: NoteService/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Docker"
+    depends_on:
+      - notedb
+
+  notedb:
+    image: mongo:latest
+    container_name: ocp10_notedb
+    ports:
+      - "27017:27017"
+    volumes:
+      - notedb:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "root"
+      MONGO_INITDB_ROOT_PASSWORD: "YourP@ssword123!"
+
 volumes:
   mssql:
+  notedb:
   keys:

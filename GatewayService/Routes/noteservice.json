@@ -1,0 +1,26 @@
+﻿[
+  {
+    "DownstreamPathTemplate": "/api/notes",
+    "DownstreamScheme": "http",
+    "DownstreamHostAndPorts": [
+      {
+        "Host": "noteservice",
+        "Port": 8081
+      }
+    ],
+    "UpstreamPathTemplate": "/notes",
+    "UpstreamHttpMethod": [ "GET", "POST" ]
+  },
+  {
+    "DownstreamPathTemplate": "/api/notes/{id}",
+    "DownstreamScheme": "http",
+    "DownstreamHostAndPorts": [
+      {
+        "Host": "noteservice",
+        "Port": 8081
+      }
+    ],
+    "UpstreamPathTemplate": "/notes/{id}",
+    "UpstreamHttpMethod": [ "GET", "PUT", "DELETE" ]
+  }
+]

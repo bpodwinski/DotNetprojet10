@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GatewayService", "GatewaySe
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frontend", "Frontend\Frontend.csproj", "{915975F1-A012-4568-B8AA-AE3623BB99F0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoteService", "NoteService\NoteService.csproj", "{1021FF91-F3CA-4377-88CA-A028A313B6BF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -33,6 +35,10 @@ Global
 		{915975F1-A012-4568-B8AA-AE3623BB99F0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{915975F1-A012-4568-B8AA-AE3623BB99F0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{915975F1-A012-4568-B8AA-AE3623BB99F0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1021FF91-F3CA-4377-88CA-A028A313B6BF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1021FF91-F3CA-4377-88CA-A028A313B6BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1021FF91-F3CA-4377-88CA-A028A313B6BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1021FF91-F3CA-4377-88CA-A028A313B6BF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
