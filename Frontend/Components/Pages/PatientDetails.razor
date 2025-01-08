@@ -1,5 +1,6 @@
 ﻿@page "/patients/{PatientId:int}"
 
+@using Frontend.Components.Partials
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.Extensions.Localization
 @using System.Text.Json
@@ -13,15 +14,15 @@
 
 <PageTitle>@Localizer["PatientDetails"]</PageTitle>
 
-<h1>@Localizer["PatientDetails"]</h1>
-
 @if (patient != null)
 {
-    <div class="d-flex align-items-center justify-content-center">
-        <div class="card" style="width: 640px;">
-            <div class="card-body">
-                <h2 class="card-title text-center">@patient.FirstName @patient.LastName</h2>
+    <h1 class="text-center mb-5">@patient.FirstName @patient.LastName</h1>
 
+    <div class="col-md-12 col-lg-4 mb-4">
+        <h2>@Localizer["PatientInfos"]</h2>
+
+        <div class="card">
+            <div class="card-body">
                 <p class="card-text text-center"><strong>@Localizer["BirthDate"]:</strong> @patient.DateOfBirth.ToShortDateString()</p>
                 <p class="card-text text-center"><strong>@Localizer["Gender"]:</strong> @patient.Gender</p>
                 <p class="card-text text-center"><strong>@Localizer["Address"]:</strong> @patient.Address</p>
@@ -30,14 +31,16 @@
         </div>
     </div>
 
-    <Notes PatientId="PatientId" />
-    <NoteAdd PatientId="PatientId" />
+    <div class="col-md-12 col-lg-8">
+        <Notes PatientId="PatientId" />
+        <NoteAdd PatientId="PatientId" />
+    </div>
 
-    <button class="btn btn-secondary mt-3" @onclick="GoBack">@Localizer["Back"]</button>
+    <button class="btn btn-secondary mt-4" @onclick="GoBack">@Localizer["Back"]</button>
 }
 else if (isLoading)
 {
-    <p>@Localizer["Loading"]...</p>
+    <Loading />
 }
 else
 {

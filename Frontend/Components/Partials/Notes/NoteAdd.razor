@@ -13,23 +13,21 @@
 
 <PageTitle>@Localizer["AddNote"]</PageTitle>
 
-<h1>@Localizer["AddNote"]</h1>
+<h2>@Localizer["AddNote"]</h2>
 
-<div class="d-flex align-items-center justify-content-center">
-    <div class="card" style="width: 640px;">
-        <div class="card-body">
-            <EditForm Model="newNote" OnValidSubmit="HandleValidSubmit">
-                <DataAnnotationsValidator />
-                <ValidationSummary />
+<div class="card mb-4">
+    <div class="card-body">
+        <EditForm Model="newNote" OnValidSubmit="HandleValidSubmit">
+            <DataAnnotationsValidator />
+            <ValidationSummary />
 
-                <div class="mb-3">
-                    <label class="form-label">@Localizer["Note"]</label>
-                    <InputTextArea @bind-Value="newNote.Note" class="form-control" />
-                </div>
+            <div class="mb-3">
+                <label class="form-label">@Localizer["Note"]</label>
+                <InputTextArea @bind-Value="newNote.Note" class="form-control" />
+            </div>
 
-                <button type="submit" class="btn btn-primary">@Localizer["AddNote"]</button>
-            </EditForm>
-        </div>
+            <button type="submit" class="btn btn-primary">@Localizer["AddNote"]</button>
+        </EditForm>
     </div>
 </div>
 

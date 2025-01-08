@@ -33,6 +33,10 @@
       <LastGenOutput>Resource.en-US.Designer.cs</LastGenOutput>
       <CustomToolNamespace>Locales</CustomToolNamespace>
     </EmbeddedResource>
+    <EmbeddedResource Update="Locales\Resource.fr-FR.resx">
+      <Generator></Generator>
+      <CustomToolNamespace></CustomToolNamespace>
+    </EmbeddedResource>
   </ItemGroup>
 
 </Project>

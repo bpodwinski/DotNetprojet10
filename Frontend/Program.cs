@@ -58,7 +58,7 @@ builder.Services.AddLocalization();
 var app = builder.Build();
 
 // Language
-var supportedCultures = new[] { new CultureInfo("en-US"), new CultureInfo("fr-FR") };
+var supportedCultures = new[] { new CultureInfo("fr-FR") };
 app.UseRequestLocalization(new RequestLocalizationOptions
 {
     DefaultRequestCulture = new RequestCulture("fr-FR"),
