@@ -5,6 +5,7 @@
 @using System.Text.Json
 @using Frontend.Services
 @using Frontend.Locales
+@using Frontend.Components.Partials.Notes
 
 @inject CustomHttpClient CustomHttpClient
 @inject IStringLocalizer<Resource> Localizer
@@ -29,6 +30,9 @@
         </div>
     </div>
 
+    <Notes PatientId="PatientId" />
+    <NoteAdd PatientId="PatientId" />
+
     <button class="btn btn-secondary mt-3" @onclick="GoBack">@Localizer["Back"]</button>
 }
 else if (isLoading)
@@ -44,7 +48,9 @@ else
     [Parameter]
     public int PatientId { get; set; }
 
+
     private Patient? patient = null;
+    private Notes? notesComponent = null;
     private bool isLoading = true;
 
     protected override async Task OnInitializedAsync()
@@ -68,6 +74,14 @@ else
         finally
         {
             isLoading = false;
+        }
+    }
+
+    private async Task RefreshNotes()
+    {
+        if (notesComponent != null)
+        {
+            await notesComponent.LoadPatientNotes();
         }
     }
 

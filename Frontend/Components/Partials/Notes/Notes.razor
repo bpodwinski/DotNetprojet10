@@ -1,0 +1,84 @@
+﻿@page "/notes/{PatientId:int}"
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.Extensions.Localization
+@using System.Text.Json
+@using Frontend.Services
+@using Frontend.Locales
+
+@inject CustomHttpClient CustomHttpClient
+@inject IStringLocalizer<Resource> Localizer
+@inject NavigationManager NavigationManager
+
+<PageTitle>@Localizer["Notes"]</PageTitle>
+
+<h1>@Localizer["Notes"]</h1>
+
+@if (notes != null && notes.Any())
+{
+    <div class="d-flex align-items-center justify-content-center">
+        <div class="notes">
+            @foreach (var note in notes)
+            {
+                var noteId = $"note-{note.Id}";
+                <div class="card @noteId mb-4" style="width: 640px;">
+                    <div class="card-body">
+                        @note.Note
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+}
+else if (isNotesLoading)
+{
+    <p>@Localizer["LoadingNotes"]...</p>
+}
+else
+{
+    <p>@Localizer["NoNotesFound"]</p>
+}
+
+@code {
+    [Parameter]
+    public int PatientId { get; set; }
+
+    private List<NoteData>? notes = null;
+    private bool isNotesLoading = true;
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await LoadPatientNotes();
+    }
+
+    public async Task LoadPatientNotes()
+    {
+        try
+        {
+            var response = await CustomHttpClient.GetAsync($"notes/patientid/{PatientId}");
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                notes = JsonSerializer.Deserialize<List<NoteData>>(responseContent, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading notes for patient: {ex.Message}");
+        }
+        finally
+        {
+            isNotesLoading = false;
+        }
+    }
+
+    private class NoteData
+    {
+        public string Id { get; set; } = string.Empty;
+        public int PatientId { get; set; }
+        public string Note { get; set; } = string.Empty;
+    }
+}
