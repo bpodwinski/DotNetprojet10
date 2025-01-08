@@ -2,20 +2,22 @@
 
 # This stage is used when running from VS in fast mode (Default for Debug configuration)
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
+RUN mkdir /keys
+RUN chown $APP_UID /keys
+RUN chmod 700 /keys
 USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
 
-
 # This stage is used to build the service project
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["Frontend/Frontend.csproj", "Frontend/"]
-RUN dotnet restore "./Frontend/Frontend.csproj"
+COPY ["Frontend.csproj", "."]
+RUN dotnet restore "./Frontend.csproj"
 COPY . .
-WORKDIR "/src/Frontend"
+WORKDIR "/src/."
 RUN dotnet build "./Frontend.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
@@ -27,4 +29,5 @@ RUN dotnet publish "./Frontend.csproj" -c $BUILD_CONFIGURATION -o /app/publish /
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+VOLUME ["/keys"]
 ENTRYPOINT ["dotnet", "Frontend.dll"]

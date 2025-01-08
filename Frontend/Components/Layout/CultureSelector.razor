@@ -1,0 +1,31 @@
+﻿@using System.Globalization
+
+@inject NavigationManager NavigationManager
+
+<div>
+    <select @onchange="ChangeLanguage">
+        <option value="en-US" selected="@IsSelectedCulture("en-US")">English</option>
+        <option value="fr-FR" selected="@IsSelectedCulture("fr-FR")">French</option>
+    </select>
+</div>
+
+@code {
+    private void ChangeLanguage(ChangeEventArgs e)
+    {
+        var selectedCulture = e.Value?.ToString();
+        if (!string.IsNullOrEmpty(selectedCulture))
+        {
+            // Change the culture
+            CultureInfo.CurrentCulture = new CultureInfo(selectedCulture);
+            CultureInfo.CurrentUICulture = new CultureInfo(selectedCulture);
+
+            // Reload the page to apply changes
+            NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
+        }
+    }
+
+    private bool IsSelectedCulture(string culture)
+    {
+        return CultureInfo.CurrentUICulture.Name.Equals(culture, StringComparison.OrdinalIgnoreCase);
+    }
+}

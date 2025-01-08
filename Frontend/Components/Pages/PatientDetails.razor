@@ -1,0 +1,89 @@
+﻿@page "/patients/{PatientId:int}"
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.Extensions.Localization
+@using System.Text.Json
+@using Frontend.Services
+@using Frontend.Locales
+
+@inject CustomHttpClient CustomHttpClient
+@inject IStringLocalizer<Resource> Localizer
+@inject NavigationManager NavigationManager
+
+<PageTitle>@Localizer["PatientDetails"]</PageTitle>
+
+<h1>@Localizer["PatientDetails"]</h1>
+
+@if (patient != null)
+{
+    <div class="d-flex align-items-center justify-content-center">
+        <div class="card" style="width: 640px;">
+            <div class="card-body">
+                <h2 class="card-title text-center">@patient.FirstName @patient.LastName</h2>
+
+                <p class="card-text text-center"><strong>@Localizer["BirthDate"]:</strong> @patient.DateOfBirth.ToShortDateString()</p>
+                <p class="card-text text-center"><strong>@Localizer["Gender"]:</strong> @patient.Gender</p>
+                <p class="card-text text-center"><strong>@Localizer["Address"]:</strong> @patient.Address</p>
+                <p class="card-text text-center"><strong>@Localizer["Phone"]:</strong> @patient.PhoneNumber</p>
+            </div>
+        </div>
+    </div>
+
+    <button class="btn btn-secondary mt-3" @onclick="GoBack">@Localizer["Back"]</button>
+}
+else if (isLoading)
+{
+    <p>@Localizer["Loading"]...</p>
+}
+else
+{
+    <p>@Localizer["PatientNotFound"]</p>
+}
+
+@code {
+    [Parameter]
+    public int PatientId { get; set; }
+
+    private Patient? patient = null;
+    private bool isLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            var response = await CustomHttpClient.GetAsync($"patients/{PatientId}");
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                patient = JsonSerializer.Deserialize<Patient>(responseContent, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Error loading patient details: {ex.Message}");
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/patients");
+    }
+
+    private class Patient
+    {
+        public int Id { get; set; }
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+        public DateTime DateOfBirth { get; set; }
+        public string Gender { get; set; } = string.Empty;
+        public string Address { get; set; } = string.Empty;
+        public string PhoneNumber { get; set; } = string.Empty;
+    }
+}
