@@ -116,6 +116,20 @@ services:
     networks:
       - ocp10_network
 
+  reportservice:
+    image: ${DOCKER_REGISTRY-}reportservice
+    container_name: ocp10_reportservice
+    build:
+      context: .
+      dockerfile: ReportService/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Docker"
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      JWT_ISSUER: ${JWT_ISSUER}
+      JWT_AUDIENCE: ${JWT_AUDIENCE}
+    networks:
+      - ocp10_network
+
 volumes:
   authdb:
   patientdb:

@@ -2,6 +2,7 @@
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using ReportService.Repositories;
 using ReportService.Services;
 using Serilog;
 using System.Reflection;
@@ -76,10 +77,17 @@ builder.Services.AddSwaggerGen(options =>
     options.IncludeXmlComments(xmlPath);
 });
 
-// Configure JWT authentication
+// Configure JWT Authentication
 IdentityModelEventSource.ShowPII = true;
-var jwt = builder.Configuration.GetSection("Jwt");
-var key = Encoding.ASCII.GetBytes(jwt["SecretKey"]!);
+
+var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
+var audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
+var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
+
+if (string.IsNullOrEmpty(issuer) || string.IsNullOrEmpty(audience) || string.IsNullOrEmpty(secretKey))
+{
+    throw new Exception("JWT configuration is incomplete. Ensure JWT_ISSUER, JWT_AUDIENCE, and JWT_SECRET_KEY are set in environment variables.");
+}
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -92,10 +100,10 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidateLifetime = true,
-            ValidIssuer = jwt["Issuer"],
-            ValidAudience = jwt["Audience"],
-            IssuerSigningKey = new SymmetricSecurityKey(key),
-            ClockSkew = TimeSpan.Zero // Minimize token expiration time drift
+            ValidIssuer = issuer,
+            ValidAudience = audience,
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
+            ClockSkew = TimeSpan.Zero
         };
     });
 
@@ -116,7 +124,12 @@ builder.Services.AddAuthorization(options =>
 });
 
 // Register repositories and services
-builder.Services.AddScoped<IReportService, NoteService.Services.ReportService>();
+builder.Services.AddScoped<IPatientRepository, PatientRepository>();
+builder.Services.AddScoped<INoteRepository, NoteRepository>();
+builder.Services.AddScoped<IReportService, ReportService.Services.ReportService>();
+
+builder.Services.AddHttpClient();
+builder.Services.AddHttpContextAccessor();
 
 var app = builder.Build();
 

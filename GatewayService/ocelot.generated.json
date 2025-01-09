@@ -26,7 +26,10 @@
       "UpstreamPathTemplate": "/notes",
       "UpstreamHttpMethod": [
         "POST"
-      ]
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
     },
     {
       "DownstreamPathTemplate": "/api/notes/id/{id}",
@@ -40,7 +43,10 @@
       "UpstreamPathTemplate": "/notes/id/{id}",
       "UpstreamHttpMethod": [
         "GET"
-      ]
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
     },
     {
       "DownstreamPathTemplate": "/api/notes/patientid/{id}",
@@ -54,7 +60,10 @@
       "UpstreamPathTemplate": "/notes/patientid/{id}",
       "UpstreamHttpMethod": [
         "GET"
-      ]
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
     },
     {
       "DownstreamPathTemplate": "/api/notes/{id}",
@@ -70,7 +79,10 @@
         "GET",
         "PUT",
         "DELETE"
-      ]
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
     },
     {
       "DownstreamPathTemplate": "/api/patients",
@@ -85,7 +97,10 @@
       "UpstreamHttpMethod": [
         "GET",
         "POST"
-      ]
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
     },
     {
       "DownstreamPathTemplate": "/api/patients/{id}",
@@ -101,7 +116,27 @@
         "GET",
         "PUT",
         "DELETE"
-      ]
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
+    },
+    {
+      "DownstreamPathTemplate": "/api/reports/diabete/{id}",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "reportservice",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/reports/diabete/{id}",
+      "UpstreamHttpMethod": [
+        "GET"
+      ],
+      "AuthenticationOptions": {
+        "AuthenticationProviderKey": "Bearer"
+      }
     }
   ],
   "GlobalConfiguration": {

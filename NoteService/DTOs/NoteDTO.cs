@@ -1,5 +1,4 @@
-﻿using MongoDB.Bson;
-using Swashbuckle.AspNetCore.Annotations;
+﻿using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 
 namespace NoteService.DTOs

@@ -16,6 +16,6 @@ namespace ReportService.Repositories
         /// A task representing the asynchronous operation. 
         /// The result is a list of Note entities, or an empty list if no notes are found.
         /// </returns>
-        Task<List<NoteDomain>> GetByPatientId(string id);
+        Task<List<NoteDomain>> GetByPatientId(int id);
     }
 }

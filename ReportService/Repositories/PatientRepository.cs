@@ -10,12 +10,14 @@ namespace ReportService.Repositories
     {
         private readonly ILogger<PatientRepository> _logger;
         private readonly HttpClient _httpClient;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private const string PatientApiUrl = "http://gateway:5000/patients";
 
-        public PatientRepository(ILogger<PatientRepository> logger, HttpClient httpClient)
+        public PatientRepository(ILogger<PatientRepository> logger, HttpClient httpClient, IHttpContextAccessor httpContextAccessor)
         {
             _logger = logger;
             _httpClient = httpClient;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         /// <summary>
@@ -29,6 +31,18 @@ namespace ReportService.Repositories
         {
             try
             {
+                // Récupérer le token JWT depuis le contexte HTTP
+                var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString()?.Replace("Bearer ", "");
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    _logger.LogError("JWT token is missing in the incoming request.");
+                    throw new Exception("JWT token is not available.");
+                }
+
+                // Ajouter le token dans les requêtes sortantes
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
                 var requestUrl = $"{PatientApiUrl}/{id}";
 
                 _logger.LogInformation("Fetching patient data from API: {Url}", requestUrl);

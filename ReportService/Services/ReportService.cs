@@ -1,4 +1,5 @@
 ﻿using ReportService.DTOs;
+using ReportService.Repositories;
 
 namespace ReportService.Services
 {
@@ -7,11 +8,13 @@ namespace ReportService.Services
     /// </summary>
     public class ReportService : IReportService
     {
-        private readonly IPatientRepository _patientRepositor;
+        private IPatientRepository _patientRepository;
+        private INoteRepository _noteRepository;
 
-        public ReportService(IPatientRepositore patientRepositor)
+        public ReportService(IPatientRepository patientRepository, INoteRepository noteRepository)
         {
-            _patientRepositor = patientRepositor;
+            _patientRepository = patientRepository;
+            _noteRepository = noteRepository;
         }
 
         /// <summary>
@@ -23,22 +26,22 @@ namespace ReportService.Services
         {
             try
             {
-                // Récupérer les informations du patient
-                var patient = await _patientService.GetPatientById(id);
+                var patient = await _patientRepository.GetById(id);
                 if (patient == null)
                 {
-                    return null; // Patient non trouvé
+                    return null;
                 }
 
-                // Récupérer les notes médicales du patient
-                var notes = await _noteService.GetNotesByPatientId(id);
-                if (notes == null || !notes.Any())
+                var age = CalculateAge(patient.DateOfBirth);
+
+                var notes = await _noteRepository.GetByPatientId(id);
+                if (notes == null || notes.Count == 0)
                 {
                     return new ReportDTO
                     {
                         PatientId = id,
                         RiskLevel = "None",
-                        TriggerTerms = new List<string>()
+                        TriggerTerms = []
                     };
                 }
 
@@ -53,7 +56,7 @@ namespace ReportService.Services
                 // Recherche des termes déclencheurs dans les notes médicales
                 var foundTriggers = notes
                     .SelectMany(note => triggerTerms.Where(term =>
-                        note.Content.Contains(term, StringComparison.OrdinalIgnoreCase)))
+                        note.Note.Contains(term, StringComparison.OrdinalIgnoreCase)))
                     .Distinct()
                     .ToList();
 
@@ -61,7 +64,7 @@ namespace ReportService.Services
                 int triggerCount = foundTriggers.Count;
 
                 // Appliquer les règles pour déterminer le niveau de risque
-                string riskLevel = CalculateRiskLevel(patient.Age, patient.Sex, triggerCount);
+                string riskLevel = CalculateRiskLevel(age, patient.Gender, triggerCount);
 
                 // Retourner le rapport
                 return new ReportDTO
@@ -80,7 +83,7 @@ namespace ReportService.Services
         /// <summary>
         /// Determines the diabetes risk level based on age, sex, and trigger count.
         /// </summary>
-        private string CalculateRiskLevel(int age, string sex, int triggerCount)
+        private string CalculateRiskLevel(int age, string gender, int triggerCount)
         {
             if (triggerCount == 0)
             {
@@ -94,11 +97,11 @@ namespace ReportService.Services
 
             if (age < 30)
             {
-                if (sex.Equals("Male", StringComparison.OrdinalIgnoreCase) && triggerCount >= 3)
+                if (gender.Equals("Male", StringComparison.OrdinalIgnoreCase) && triggerCount >= 3)
                 {
                     return "In Danger";
                 }
-                if (sex.Equals("Female", StringComparison.OrdinalIgnoreCase) && triggerCount >= 4)
+                if (gender.Equals("Female", StringComparison.OrdinalIgnoreCase) && triggerCount >= 4)
                 {
                     return "In Danger";
                 }
@@ -110,11 +113,11 @@ namespace ReportService.Services
 
             if (age < 30)
             {
-                if (sex.Equals("Male", StringComparison.OrdinalIgnoreCase) && triggerCount >= 5)
+                if (gender.Equals("Male", StringComparison.OrdinalIgnoreCase) && triggerCount >= 5)
                 {
                     return "Early Onset";
                 }
-                if (sex.Equals("Female", StringComparison.OrdinalIgnoreCase) && triggerCount >= 7)
+                if (gender.Equals("Female", StringComparison.OrdinalIgnoreCase) && triggerCount >= 7)
                 {
                     return "Early Onset";
                 }
@@ -125,6 +128,21 @@ namespace ReportService.Services
             }
 
             return "None"; // Cas par défaut
+        }
+
+        /// <summary>
+        /// Calculates age from a date of birth.
+        /// </summary>
+        /// <param name="dateOfBirth">The date of birth.</param>
+        /// <returns>The calculated age.</returns>
+        private int CalculateAge(DateTime dateOfBirth)
+        {
+            var today = DateTime.Today;
+            var age = today.Year - dateOfBirth.Year;
+
+            if (dateOfBirth.Date > today.AddYears(-age)) age--;
+
+            return age;
         }
     }
 }

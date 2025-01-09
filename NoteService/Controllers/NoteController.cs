@@ -21,7 +21,7 @@ namespace NoteService.Controllers
         /// <response code="404">If the Note with the specified ID is not found</response>
         /// <response code="500">If an internal error occurs</response>
         [HttpGet("id/{id}")]
-        [Authorize(policy: "User")]
+        //[Authorize(policy: "User")]
         [ProducesResponseType(typeof(NoteDTO), 200)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]

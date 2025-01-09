@@ -1,6 +1,7 @@
 ﻿@page "/patients/{PatientId:int}"
 
 @using Frontend.Components.Partials
+@using Frontend.Components.Partials.Diabete
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.Extensions.Localization
 @using System.Text.Json
@@ -21,7 +22,7 @@
     <div class="col-md-12 col-lg-4 mb-4">
         <h2>@Localizer["PatientInfos"]</h2>
 
-        <div class="card">
+        <div class="card mb-4">
             <div class="card-body">
                 <p class="card-text text-center"><strong>@Localizer["BirthDate"]:</strong> @patient.DateOfBirth.ToShortDateString()</p>
                 <p class="card-text text-center"><strong>@Localizer["Gender"]:</strong> @patient.Gender</p>
@@ -29,11 +30,13 @@
                 <p class="card-text text-center"><strong>@Localizer["Phone"]:</strong> @patient.PhoneNumber</p>
             </div>
         </div>
+
+        <DiabeteReport PatientId="PatientId" />
     </div>
 
     <div class="col-md-12 col-lg-8">
-        <Notes PatientId="PatientId" />
         <NoteAdd PatientId="PatientId" />
+        <Notes PatientId="PatientId" />
     </div>
 
     <button class="btn btn-secondary mt-4" @onclick="GoBack">@Localizer["Back"]</button>

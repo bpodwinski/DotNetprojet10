@@ -10,12 +10,14 @@ namespace ReportService.Repositories
     {
         private readonly ILogger<NoteRepository> _logger;
         private readonly HttpClient _httpClient;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private const string NoteApiUrl = "http://gateway:5000/notes";
 
-        public NoteRepository(ILogger<NoteRepository> logger, HttpClient httpClient)
+        public NoteRepository(ILogger<NoteRepository> logger, HttpClient httpClient, IHttpContextAccessor httpContextAccessor)
         {
             _logger = logger;
             _httpClient = httpClient;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         /// <summary>
@@ -25,10 +27,22 @@ namespace ReportService.Repositories
         /// <returns>
         /// A list of Note entities, or an empty list if no notes are found.
         /// </returns>
-        public async Task<List<NoteDomain>> GetByPatientId(string id)
+        public async Task<List<NoteDomain>> GetByPatientId(int id)
         {
             try
             {
+                // Récupérer le token JWT depuis le contexte HTTP
+                var token = _httpContextAccessor.HttpContext?.Request.Headers["Authorization"].ToString()?.Replace("Bearer ", "");
+
+                if (string.IsNullOrEmpty(token))
+                {
+                    _logger.LogError("JWT token is missing in the incoming request.");
+                    throw new Exception("JWT token is not available.");
+                }
+
+                // Ajouter le token dans les requêtes sortantes
+                _httpClient.DefaultRequestHeaders.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", token);
+
                 var requestUrl = $"{NoteApiUrl}/patientid/{id}";
 
                 _logger.LogInformation("Fetching note data from API: {Url}", requestUrl);

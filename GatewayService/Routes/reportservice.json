@@ -1,0 +1,17 @@
+[
+  {
+    "DownstreamPathTemplate": "/api/reports/diabete/{id}",
+    "DownstreamScheme": "http",
+    "DownstreamHostAndPorts": [
+      {
+        "Host": "reportservice",
+        "Port": 8080
+      }
+    ],
+    "UpstreamPathTemplate": "/reports/diabete/{id}",
+    "UpstreamHttpMethod": [ "GET" ],
+    "AuthenticationOptions": {
+      "AuthenticationProviderKey": "Bearer"
+    }
+  }
+]

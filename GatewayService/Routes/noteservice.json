@@ -9,7 +9,10 @@
       }
     ],
     "UpstreamPathTemplate": "/notes",
-    "UpstreamHttpMethod": [ "POST" ]
+    "UpstreamHttpMethod": [ "POST" ],
+    "AuthenticationOptions": {
+      "AuthenticationProviderKey": "Bearer"
+    }
   },
   {
     "DownstreamPathTemplate": "/api/notes/id/{id}",
@@ -21,7 +24,10 @@
       }
     ],
     "UpstreamPathTemplate": "/notes/id/{id}",
-    "UpstreamHttpMethod": [ "GET" ]
+    "UpstreamHttpMethod": [ "GET" ],
+    "AuthenticationOptions": {
+      "AuthenticationProviderKey": "Bearer"
+    }
   },
   {
     "DownstreamPathTemplate": "/api/notes/patientid/{id}",
@@ -33,7 +39,10 @@
       }
     ],
     "UpstreamPathTemplate": "/notes/patientid/{id}",
-    "UpstreamHttpMethod": [ "GET" ]
+    "UpstreamHttpMethod": [ "GET" ],
+    "AuthenticationOptions": {
+      "AuthenticationProviderKey": "Bearer"
+    }
   },
   {
     "DownstreamPathTemplate": "/api/notes/{id}",
@@ -45,6 +54,9 @@
       }
     ],
     "UpstreamPathTemplate": "/notes/{id}",
-    "UpstreamHttpMethod": [ "GET", "PUT", "DELETE" ]
+    "UpstreamHttpMethod": [ "GET", "PUT", "DELETE" ],
+    "AuthenticationOptions": {
+      "AuthenticationProviderKey": "Bearer"
+    }
   }
 ]
