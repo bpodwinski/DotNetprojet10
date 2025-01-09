@@ -12,6 +12,9 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: "Development"
       ASPNETCORE_HTTP_PORTS: "5000"
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      JWT_ISSUER: ${JWT_ISSUER}
+      JWT_AUDIENCE: ${JWT_AUDIENCE}
     networks:
       - ocp10_network
 
@@ -26,6 +29,35 @@ services:
     networks:
       - ocp10_network
 
+  authservice:
+    image: ${DOCKER_REGISTRY-}authservice
+    container_name: ocp10_authservice
+    build:
+      context: .
+      dockerfile: AuthService/Dockerfile
+    environment:
+      ASPNETCORE_ENVIRONMENT: "Docker"
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      JWT_ISSUER: ${JWT_ISSUER}
+      JWT_AUDIENCE: ${JWT_AUDIENCE}
+    depends_on:
+      - authdb
+    networks:
+      - ocp10_network
+
+  authdb:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: ocp10_authdb
+    ports:
+      - "1434:1433"
+    volumes:
+      - authdb:/var/opt/mssql
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "YourP@ssword123!"
+    networks:
+      - ocp10_network
+
   patientservice:
     image: ${DOCKER_REGISTRY-}patientservice
     container_name: ocp10_patientservice
@@ -34,6 +66,9 @@ services:
       dockerfile: PatientService/Dockerfile
     environment:
       ASPNETCORE_ENVIRONMENT: "Docker"
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      JWT_ISSUER: ${JWT_ISSUER}
+      JWT_AUDIENCE: ${JWT_AUDIENCE}
     depends_on:
       - patientdb
     networks:
@@ -45,7 +80,7 @@ services:
     ports:
       - "1433:1433"
     volumes:
-      - mssql:/var/opt/mssql
+      - patientdb:/var/opt/mssql
     environment:
       ACCEPT_EULA: "Y"
       MSSQL_SA_PASSWORD: "YourP@ssword123!"
@@ -60,6 +95,9 @@ services:
       dockerfile: NoteService/Dockerfile
     environment:
       ASPNETCORE_ENVIRONMENT: "Docker"
+      JWT_SECRET_KEY: ${JWT_SECRET_KEY}
+      JWT_ISSUER: ${JWT_ISSUER}
+      JWT_AUDIENCE: ${JWT_AUDIENCE}
     depends_on:
       - notedb
     networks:
@@ -79,7 +117,8 @@ services:
       - ocp10_network
 
 volumes:
-  mssql:
+  authdb:
+  patientdb:
   notedb:
   keys:
   

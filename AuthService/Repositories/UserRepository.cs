@@ -1,8 +1,8 @@
-using PatientService.Data;
-using PatientService.Domain;
+using AuthService.Data;
+using AuthService.Domain;
 using Microsoft.EntityFrameworkCore;
 
-namespace PatientService.Repositories
+namespace AuthService.Repositories
 {
     /// <summary>
     /// Repository class for managing User entities in the database.

@@ -6,7 +6,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace PatientService.Services
+namespace ReportService.Services
 {
     /// <summary>
     /// Service to manage authentication tokens, including generating, storing, and revoking refresh tokens.

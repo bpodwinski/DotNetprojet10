@@ -1,6 +1,20 @@
 {
   "Routes": [
     {
+      "DownstreamPathTemplate": "/auth/login",
+      "DownstreamScheme": "http",
+      "DownstreamHostAndPorts": [
+        {
+          "Host": "authservice",
+          "Port": 8080
+        }
+      ],
+      "UpstreamPathTemplate": "/auth/login",
+      "UpstreamHttpMethod": [
+        "POST"
+      ]
+    },
+    {
       "DownstreamPathTemplate": "/api/notes",
       "DownstreamScheme": "http",
       "DownstreamHostAndPorts": [
@@ -88,23 +102,12 @@
         "PUT",
         "DELETE"
       ]
-    },
-    {
-      "DownstreamPathTemplate": "/auth/login",
-      "DownstreamScheme": "http",
-      "DownstreamHostAndPorts": [
-        {
-          "Host": "patientservice",
-          "Port": 8080
-        }
-      ],
-      "UpstreamPathTemplate": "/auth/login",
-      "UpstreamHttpMethod": [
-        "POST"
-      ]
     }
   ],
   "GlobalConfiguration": {
-    "BaseUrl": "http://localhost:5000"
+    "BaseUrl": "http://localhost:5000",
+    "AuthenticationOptions": {
+      "AuthenticationProviderKey": "Bearer"
+    }
   }
 }

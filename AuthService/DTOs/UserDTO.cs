@@ -1,7 +1,7 @@
 ﻿using Swashbuckle.AspNetCore.Annotations;
 using System.ComponentModel.DataAnnotations;
 
-namespace PatientService.DTOs
+namespace AuthService.DTOs
 {
     /// <summary>
     /// Data Transfer Object representing a User entity.

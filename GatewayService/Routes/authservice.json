@@ -1,0 +1,14 @@
+﻿[
+  {
+    "DownstreamPathTemplate": "/auth/login",
+    "DownstreamScheme": "http",
+    "DownstreamHostAndPorts": [
+      {
+        "Host": "authservice",
+        "Port": 8080
+      }
+    ],
+    "UpstreamPathTemplate": "/auth/login",
+    "UpstreamHttpMethod": [ "POST" ]
+  }
+]

@@ -1,11 +1,11 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using PatientService.Controllers;
-using PatientService.Domain;
-using PatientService.DTOs;
-using PatientService.Repositories;
+using AuthService.Controllers;
+using AuthService.Domain;
+using AuthService.DTOs;
+using AuthService.Repositories;
 using System.Security.Claims;
 
-namespace PatientService.Services
+namespace AuthService.Services
 {
     public class UserService : IUserService
     {

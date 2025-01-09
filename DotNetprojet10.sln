@@ -13,6 +13,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Frontend", "Frontend\Fronte
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NoteService", "NoteService\NoteService.csproj", "{1021FF91-F3CA-4377-88CA-A028A313B6BF}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ReportService", "ReportService\ReportService.csproj", "{43643207-CA87-412F-A18F-64F3CB51439F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AuthService", "AuthService\AuthService.csproj", "{3386DBF1-38A9-4834-ADAC-786514A81B57}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +43,14 @@ Global
 		{1021FF91-F3CA-4377-88CA-A028A313B6BF}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1021FF91-F3CA-4377-88CA-A028A313B6BF}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1021FF91-F3CA-4377-88CA-A028A313B6BF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{43643207-CA87-412F-A18F-64F3CB51439F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{43643207-CA87-412F-A18F-64F3CB51439F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{43643207-CA87-412F-A18F-64F3CB51439F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{43643207-CA87-412F-A18F-64F3CB51439F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3386DBF1-38A9-4834-ADAC-786514A81B57}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3386DBF1-38A9-4834-ADAC-786514A81B57}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3386DBF1-38A9-4834-ADAC-786514A81B57}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3386DBF1-38A9-4834-ADAC-786514A81B57}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

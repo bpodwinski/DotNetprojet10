@@ -1,11 +1,11 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using PatientService.Domain;
-using PatientService.Models;
-using PatientService.Services;
+using AuthService.Domain;
+using AuthService.Models;
+using AuthService.Services;
 
-namespace PatientService.Controllers
+namespace AuthService.Controllers
 {
     /// <summary>
     /// Controller to handle authentication operations, including JWT generation, refresh token management, and token revocation.

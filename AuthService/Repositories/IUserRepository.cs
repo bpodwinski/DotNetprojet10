@@ -1,6 +1,6 @@
-﻿using PatientService.Domain;
+﻿using AuthService.Domain;
 
-namespace PatientService.Repositories
+namespace AuthService.Repositories
 {
     /// <summary>
     /// Interface for managing User entities in the database.

@@ -1,7 +1,7 @@
-﻿using PatientService.Domain;
+﻿using AuthService.Domain;
 using System.Security.Claims;
 
-namespace PatientService.Services
+namespace AuthService.Services
 {
     /// <summary>
     /// Interface to define methods for authentication token management, including JWT and refresh token handling.

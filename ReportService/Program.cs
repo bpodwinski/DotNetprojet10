@@ -1,16 +1,15 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using PatientService.Data;
-using PatientService.Repositories;
-using PatientService.Services;
+using ReportService.Services;
 using Serilog;
 using System.Reflection;
 using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Load configuration files
 ConfigurationManager configuration = builder.Configuration;
 
 var environment = builder.Environment.EnvironmentName;
@@ -18,28 +17,28 @@ builder.Configuration
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .AddJsonFile($"appsettings{environment}.json", optional: true);
 
-// Configure Serilog to write logs to a file
+// Configure Serilog for logging
 Log.Logger = new LoggerConfiguration()
-    .WriteTo.File("PatientService.log", rollingInterval: RollingInterval.Day) // One file per day
+    .WriteTo.File("ReportService.log", rollingInterval: RollingInterval.Day)
     .CreateLogger();
 builder.Host.UseSerilog();
 
-// Add services to the container.
+// Add services to the container
 builder.Services.AddControllers()
     .AddJsonOptions(options =>
     {
         options.JsonSerializerOptions.Converters.Add(new System.Text.Json.Serialization.JsonStringEnumConverter());
     });
-builder.Services.AddEndpointsApiExplorer();
 
 // Configure Swagger/OpenAPI
+builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>
 {
     options.EnableAnnotations();
 
     options.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "PatientService",
+        Title = "ReportService API",
         Version = "v1"
     });
 
@@ -47,8 +46,8 @@ builder.Services.AddSwaggerGen(options =>
     {
         In = ParameterLocation.Header,
         Description = "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\"",
-        Scheme = "Bearer",
         Name = "Authorization",
+        Scheme = "Bearer",
         BearerFormat = "JWT",
         Type = SecuritySchemeType.ApiKey
     });
@@ -71,27 +70,16 @@ builder.Services.AddSwaggerGen(options =>
         }
     });
 
-    // Get the XML comments file path
+    // Include XML comments for Swagger
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     options.IncludeXmlComments(xmlPath);
 });
 
-// Configure DbContext and Identity
-builder.Services.AddDbContext<LocalDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-// Configure JWT Authentication
+// Configure JWT authentication
 IdentityModelEventSource.ShowPII = true;
-
-var issuer = Environment.GetEnvironmentVariable("JWT_ISSUER");
-var audience = Environment.GetEnvironmentVariable("JWT_AUDIENCE");
-var secretKey = Environment.GetEnvironmentVariable("JWT_SECRET_KEY");
-
-if (string.IsNullOrEmpty(issuer) || string.IsNullOrEmpty(audience) || string.IsNullOrEmpty(secretKey))
-{
-    throw new Exception("JWT configuration is incomplete. Ensure JWT_ISSUER, JWT_AUDIENCE, and JWT_SECRET_KEY are set in environment variables.");
-}
+var jwt = builder.Configuration.GetSection("Jwt");
+var key = Encoding.ASCII.GetBytes(jwt["SecretKey"]!);
 
 builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
@@ -104,57 +92,47 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuer = true,
             ValidateAudience = true,
             ValidateLifetime = true,
-            ValidIssuer = issuer,
-            ValidAudience = audience,
-            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
-            ClockSkew = TimeSpan.Zero
+            ValidIssuer = jwt["Issuer"],
+            ValidAudience = jwt["Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(key),
+            ClockSkew = TimeSpan.Zero // Minimize token expiration time drift
         };
     });
 
-// Authorization policies
+// Configure role-based authorization
 builder.Services.AddAuthorization(options =>
 {
     options.AddPolicy("Admin", policy =>
     {
         policy.RequireRole("Admin");
         policy.RequireAuthenticatedUser();
-        policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme);
     });
 
     options.AddPolicy("User", policy =>
     {
         policy.RequireRole("User", "Admin");
         policy.RequireAuthenticatedUser();
-        policy.AddAuthenticationSchemes(JwtBearerDefaults.AuthenticationScheme);
     });
 });
 
 // Register repositories and services
-builder.Services.AddScoped<IPatientRepository, PatientRepository>();
-builder.Services.AddScoped<IPatientService, PatientService.Services.PatientService>();
+builder.Services.AddScoped<IReportService, NoteService.Services.ReportService>();
 
 var app = builder.Build();
 
-// Ensure database is migrated in Development mode
+// Apply Serilog request logging
+app.UseSerilogRequestLogging();
+
+// Apply middleware
 if (app.Environment.IsDevelopment())
 {
-    using (var scope = app.Services.CreateScope())
-    {
-        var dbcontext = scope.ServiceProvider.GetRequiredService<LocalDbContext>();
-        dbcontext.Database.Migrate();
-    }
-
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
-// Use Serilog to record logs
-app.UseSerilogRequestLogging();
-
-// Apply authentication and authorization middleware
+app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
-
-app.UseHttpsRedirection();
 app.MapControllers();
+
 app.Run();

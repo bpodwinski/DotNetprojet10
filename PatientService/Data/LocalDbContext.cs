@@ -1,11 +1,9 @@
 using Microsoft.EntityFrameworkCore;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using PatientService.Domain;
 
 namespace PatientService.Data
 {
-    public class LocalDbContext : IdentityDbContext<UserDomain, IdentityRole<int>, int>
+    public class LocalDbContext : DbContext
     {
         public LocalDbContext(DbContextOptions<LocalDbContext> options) : base(options) { }
 

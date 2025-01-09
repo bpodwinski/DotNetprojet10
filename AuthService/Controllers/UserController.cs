@@ -1,10 +1,10 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using PatientService.DTOs;
-using PatientService.Services;
+using AuthService.DTOs;
+using AuthService.Services;
 using System.Security.Claims;
 
-namespace PatientService.Controllers
+namespace AuthService.Controllers
 {
     [ApiController]
     [Route("users")]

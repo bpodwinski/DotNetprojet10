@@ -1,7 +1,7 @@
-﻿using PatientService.DTOs;
+﻿using AuthService.DTOs;
 using System.Security.Claims;
 
-namespace PatientService.Services
+namespace AuthService.Services
 {
     /// <summary>
     /// Interface for managing operations on User entities.

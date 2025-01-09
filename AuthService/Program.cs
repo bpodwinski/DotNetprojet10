@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using PatientService.Data;
-using PatientService.Repositories;
-using PatientService.Services;
+using AuthService.Data;
+using AuthService.Domain;
+using AuthService.Repositories;
+using AuthService.Services;
 using Serilog;
 using System.Reflection;
 using System.Text;
@@ -20,7 +22,7 @@ builder.Configuration
 
 // Configure Serilog to write logs to a file
 Log.Logger = new LoggerConfiguration()
-    .WriteTo.File("PatientService.log", rollingInterval: RollingInterval.Day) // One file per day
+    .WriteTo.File("AuthService.log", rollingInterval: RollingInterval.Day) // One file per day
     .CreateLogger();
 builder.Host.UseSerilog();
 
@@ -39,7 +41,7 @@ builder.Services.AddSwaggerGen(options =>
 
     options.SwaggerDoc("v1", new OpenApiInfo
     {
-        Title = "PatientService",
+        Title = "AuthService",
         Version = "v1"
     });
 
@@ -80,6 +82,10 @@ builder.Services.AddSwaggerGen(options =>
 // Configure DbContext and Identity
 builder.Services.AddDbContext<LocalDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddIdentity<UserDomain, IdentityRole<int>>()
+    .AddEntityFrameworkStores<LocalDbContext>()
+    .AddDefaultTokenProviders();
 
 // Configure JWT Authentication
 IdentityModelEventSource.ShowPII = true;
@@ -130,8 +136,9 @@ builder.Services.AddAuthorization(options =>
 });
 
 // Register repositories and services
-builder.Services.AddScoped<IPatientRepository, PatientRepository>();
-builder.Services.AddScoped<IPatientService, PatientService.Services.PatientService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IAuthService, AuthService.Services.AuthService>();
 
 var app = builder.Build();
 
@@ -151,6 +158,9 @@ if (app.Environment.IsDevelopment())
 // Use Serilog to record logs
 app.UseSerilogRequestLogging();
 
+// Call the role and administrator initialization method
+await InitializeRolesAndAdminUserAsync(app.Services);
+
 // Apply authentication and authorization middleware
 app.UseAuthentication();
 app.UseAuthorization();
@@ -158,3 +168,55 @@ app.UseAuthorization();
 app.UseHttpsRedirection();
 app.MapControllers();
 app.Run();
+
+
+// Method for initializing roles and admin user
+static async Task InitializeRolesAndAdminUserAsync(IServiceProvider serviceProvider)
+{
+    try
+    {
+        using var scope = serviceProvider.CreateScope();
+        var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<IdentityRole<int>>>();
+        var userManager = scope.ServiceProvider.GetRequiredService<UserManager<UserDomain>>();
+        var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+
+        if (!await roleManager.RoleExistsAsync("User"))
+        {
+            await roleManager.CreateAsync(new IdentityRole<int> { Name = "User" });
+            await roleManager.CreateAsync(new IdentityRole<int> { Name = "Admin" });
+
+            var admins = await userManager.GetUsersInRoleAsync("Admin");
+
+            if (admins.Count == 0)
+            {
+                var user = new UserDomain
+                {
+                    UserName = "admin",
+                    FullName = "Super Admin",
+                    Role = "Admin",
+                };
+
+                var result = await userManager.CreateAsync(user, "Ls7N0U7tmZ48!");
+
+                if (result.Succeeded)
+                {
+                    await userManager.AddToRoleAsync(user, user.Role);
+                    logger.LogInformation("Admin user created successfully.");
+                }
+                else
+                {
+                    logger.LogError("Failed to create admin user: {Errors}", string.Join(", ", result.Errors.Select(e => e.Description)));
+                }
+            }
+            else
+            {
+                logger.LogInformation("Admin user already exists.");
+            }
+        }
+    }
+    catch (Exception ex)
+    {
+        var logger = serviceProvider.GetRequiredService<ILogger<Program>>();
+        logger.LogError(ex, "An error occurred while initializing roles and admin user.");
+    }
+}
