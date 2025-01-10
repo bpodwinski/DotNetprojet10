@@ -20,7 +20,8 @@ builder.Configuration
 
 // Configure Serilog to write logs to a file
 Log.Logger = new LoggerConfiguration()
-    .WriteTo.File("PatientService.log", rollingInterval: RollingInterval.Day) // One file per day
+    .WriteTo.Console()
+    .WriteTo.File("PatientService_.log", rollingInterval: RollingInterval.Day)
     .CreateLogger();
 builder.Host.UseSerilog();
 

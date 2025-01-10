@@ -21,7 +21,8 @@ builder.Configuration
 
 // Configure Serilog for logging
 Log.Logger = new LoggerConfiguration()
-    .WriteTo.File("NoteService.log", rollingInterval: RollingInterval.Day)
+    .WriteTo.Console()
+    .WriteTo.File("NoteService_.log", rollingInterval: RollingInterval.Day)
     .CreateLogger();
 builder.Host.UseSerilog();
 
