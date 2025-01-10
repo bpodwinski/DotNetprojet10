@@ -9,7 +9,6 @@
 
 @inject CustomHttpClient CustomHttpClient
 @inject IStringLocalizer<Resource> Localizer
-@inject NavigationManager NavigationManager
 
 <PageTitle>@Localizer["AddNote"]</PageTitle>
 
@@ -40,6 +39,9 @@
     [Parameter]
     public int? PatientId { get; set; }
 
+    [Parameter]
+    public EventCallback OnNoteAdded { get; set; }
+
     private NoteInputModel newNote = new();
     private string statusMessage = string.Empty;
 
@@ -52,7 +54,7 @@
             {
                 statusMessage = Localizer["NoteAdded"];
 
-                NavigationManager.NavigateTo(NavigationManager.Uri, forceLoad: true);
+                await OnNoteAdded.InvokeAsync();
             }
             else
             {

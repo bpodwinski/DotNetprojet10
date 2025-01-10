@@ -1,5 +1,4 @@
 using Frontend.Components;
-using Frontend.Components.Account;
 using Frontend.Data;
 using Frontend.Services;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -17,9 +16,6 @@ builder.Services.AddRazorComponents()
 
 // Add Authentication State Cascading and Identity-related services
 builder.Services.AddCascadingAuthenticationState();
-builder.Services.AddScoped<IdentityUserAccessor>();
-builder.Services.AddScoped<IdentityRedirectManager>();
-builder.Services.AddScoped<AuthenticationStateProvider, IdentityRevalidatingAuthenticationStateProvider>();
 
 // Configure Authentication and Identity Cookies
 builder.Services.AddAuthentication(options =>
@@ -43,7 +39,6 @@ builder.Services.AddIdentityCore<ApplicationUser>(options => options.SignIn.Requ
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddSignInManager()
     .AddDefaultTokenProviders();
-builder.Services.AddSingleton<IEmailSender<ApplicationUser>, IdentityNoOpEmailSender>();
 
 // Add Authorization and Custom Authentication State Provider
 builder.Services.AddAuthorizationCore();
@@ -97,7 +92,5 @@ app.MapStaticAssets();
 
 app.MapRazorComponents<App>()
     .AddInteractiveServerRenderMode();
-
-app.MapAdditionalIdentityEndpoints();
 
 app.Run();

@@ -35,8 +35,8 @@
     </div>
 
     <div class="col-md-12 col-lg-8">
-        <NoteAdd PatientId="PatientId" />
-        <Notes PatientId="PatientId" />
+        <NoteAdd PatientId="PatientId" OnNoteAdded="RefreshNotes" />
+        <Notes @ref="notesComponent" PatientId="PatientId" />
     </div>
 
     <div class="col-md-12 col-lg-12">
@@ -56,15 +56,24 @@ else
     [Parameter]
     public int PatientId { get; set; }
 
-
     private Patient? patient = null;
     private Notes? notesComponent = null;
     private bool isLoading = true;
+    private bool dataLoaded = false;
 
     protected override async Task OnInitializedAsync()
     {
+        if (!dataLoaded)
+        {
+            await LoadPatientData();
+        }
+    }
+
+    private async Task LoadPatientData()
+    {
         try
         {
+            isLoading = true;
             var response = await CustomHttpClient.GetAsync($"patients/{PatientId}");
             if (response.IsSuccessStatusCode)
             {
@@ -73,11 +82,17 @@ else
                     {
                         PropertyNameCaseInsensitive = true
                     });
+                dataLoaded = true; // Indiquer que les données sont chargées
+            }
+            else
+            {
+                patient = null;
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error loading patient details: {ex.Message}");
+            patient = null;
         }
         finally
         {
@@ -90,6 +105,7 @@ else
         if (notesComponent != null)
         {
             await notesComponent.LoadPatientNotes();
+            StateHasChanged();
         }
     }
 
