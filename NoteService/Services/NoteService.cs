@@ -158,7 +158,8 @@ namespace NoteService.Services
         {
             Id = noteDomain.Id,
             PatientId = noteDomain.PatientId,
-            Note = noteDomain.Note
+            Note = noteDomain.Note,
+            Date = noteDomain.Date
         };
     }
 }

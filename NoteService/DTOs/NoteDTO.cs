@@ -25,5 +25,8 @@ namespace NoteService.DTOs
         [Required(ErrorMessage = "Note is required.")]
         [MaxLength(500, ErrorMessage = "Note cannot exceed 500 characters.")]
         public required string Note { get; set; }
+
+        [SwaggerSchema(ReadOnly = true)]
+        public DateTime? Date { get; set; }
     }
 }

@@ -1,5 +1,4 @@
-﻿using MongoDB.Bson;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 using NoteService.Data;
 using NoteService.Domain;
 
@@ -93,15 +92,25 @@ namespace NoteService.Repositories
         }
 
         /// <summary>
-        /// Asynchronously retrieves a Note entity by its ID.
+        /// Asynchronously retrieves Note entities by Patient ID with optional sorting.
         /// </summary>
-        /// <param name="id">The ID of the Note entity to retrieve.</param>
-        /// <returns>The Note entity, or null if not found.</returns>
-        public async Task<List<NoteDomain>> GetByPatientId(int id)
+        /// <param name="id">The ID of the Patient whose notes are to be retrieved.</param>
+        /// <param name="sortBy">The field by which to sort the notes (e.g., "Date", "Content"). Default is "Date".</param>
+        /// <param name="isDescending">Specifies whether the sorting should be in descending order. Default is true.</param>
+        /// <returns>A sorted list of Note entities, or an empty list if no notes are found.</returns>
+        public async Task<List<NoteDomain>> GetByPatientId(int id, string sortBy = "Date", bool isDescending = true)
         {
             try
             {
-                var notes = await _notesCollection.Find(note => note.PatientId == id).ToListAsync();
+                var filter = Builders<NoteDomain>.Filter.Eq(note => note.PatientId, id);
+
+                // Define the sort definition based on input
+                var sortDefinition = isDescending
+                    ? Builders<NoteDomain>.Sort.Descending(sortBy)
+                    : Builders<NoteDomain>.Sort.Ascending(sortBy);
+
+                var notes = await _notesCollection.Find(filter).Sort(sortDefinition).ToListAsync();
+
                 if (notes.Count == 0)
                 {
                     _logger.LogWarning("No notes found for PatientId {Id}.", id);

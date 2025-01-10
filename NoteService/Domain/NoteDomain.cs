@@ -7,8 +7,12 @@ namespace NoteService.Domain
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; } = string.Empty;
+        public string Id { get; set; }
         public required int PatientId { get; set; }
         public required string Note { get; set; }
+
+        [BsonDateTimeOptions(Kind = DateTimeKind.Utc)]
+        public DateTime Date { get; set; } = DateTime.UtcNow;
+
     }
 }

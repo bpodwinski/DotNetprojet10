@@ -21,6 +21,11 @@
         {
             var noteId = $"note-{note.Id}";
             <div class="card @noteId mb-4">
+
+                <div class="card-header">
+                    @Localizer["NoteFrom"] @note.LocalDate
+                </div>
+
                 <div class="card-body">
                     @note.Note
                 </div>
@@ -81,5 +86,14 @@ else
         public string Id { get; set; } = string.Empty;
         public int PatientId { get; set; }
         public string Note { get; set; } = string.Empty;
+        public DateTime Date { get; set; }
+        public string LocalDate
+        {
+            get
+            {
+                var timeZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Paris");
+                return TimeZoneInfo.ConvertTimeFromUtc(Date, timeZone).ToString("yyyy-MM-dd HH:mm:ss");
+            }
+        }
     }
 }

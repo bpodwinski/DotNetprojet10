@@ -19,6 +19,12 @@ builder.Configuration
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .AddJsonFile($"appsettings{environment}.json", optional: true);
 
+//  Load .env file if environment is not Docker
+if (!string.Equals(environment, "Docker", StringComparison.OrdinalIgnoreCase))
+{
+    DotNetEnv.Env.Load();
+}
+
 // Configure Serilog for logging
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
