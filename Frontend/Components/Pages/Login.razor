@@ -1,4 +1,4 @@
-﻿@page "/account/login"
+﻿@page "/login"
 
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Authentication
@@ -14,7 +14,6 @@
 @inject SignInManager<ApplicationUser> SignInManager
 @inject ILogger<Login> Logger
 @inject NavigationManager NavigationManager
-@inject IdentityRedirectManager RedirectManager
 @inject HttpClient HttpClient
 @inject IStringLocalizer<Resource> Localizer
 @inject CustomAuthenticationStateProvider AuthStateProvider
@@ -61,15 +60,6 @@
     [SupplyParameterFromQuery]
     private string? ReturnUrl { get; set; }
 
-    protected override async Task OnInitializedAsync()
-    {
-        if (HttpMethods.IsGet(HttpContext.Request.Method))
-        {
-            // Clear existing external cookie to ensure clean login process
-            await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
-        }
-    }
-
     public async Task LoginUser()
     {
         try
@@ -92,20 +82,11 @@
 
                 if (loginResponse != null && !string.IsNullOrEmpty(loginResponse.Token))
                 {
-                    // Store JWT token in cookie
-                    HttpContext.Response.Cookies.Append("AuthToken", loginResponse.Token, new CookieOptions
-                        {
-                            HttpOnly = true,
-                            Secure = true,
-                            SameSite = SameSiteMode.Strict,
-                            Expires = DateTimeOffset.UtcNow.AddHours(1)
-                        });
+                    await AuthStateProvider.NotifyUserAuthenticationAsync(loginResponse.Token);
 
                     Logger.LogInformation("User logged in.");
 
-                    // Notify authentication state provider
-                    AuthStateProvider.NotifyUserAuthentication(loginResponse.Token);
-                    StateHasChanged();
+                    NavigationManager.NavigateTo("patients", true);
                 }
                 else
                 {

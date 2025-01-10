@@ -34,7 +34,7 @@
             </Authorized>
             <NotAuthorized>
                 <div class="nav-item px-3">
-                    <NavLink class="nav-link" href="Account/Login">
+                    <NavLink class="nav-link" href="login">
                         <span class="bi bi-person-badge-nav-menu" aria-hidden="true"></span> @Localizer["Login"]
                     </NavLink>
                 </div>
@@ -72,9 +72,9 @@
             if (response.IsSuccessStatusCode)
             {
                 // Notify authentication state provider
-                AuthStateProvider.NotifyUserLogout();
+                await  ((CustomAuthenticationStateProvider)AuthStateProvider).NotifyUserLogout();
 
-                NavigationManager.NavigateTo("Account/Login", true);
+                NavigationManager.NavigateTo("login", true);
             }
             else
             {

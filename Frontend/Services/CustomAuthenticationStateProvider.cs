@@ -1,29 +1,31 @@
 ﻿using System.Security.Claims;
 using System.Text.Json;
 using Microsoft.AspNetCore.Components.Authorization;
+using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
 
 namespace Frontend.Services
 {
-    public class CustomAuthenticationStateProvider(CustomHttpClient customhttpClient, IHttpContextAccessor httpContextAccessor, ILogger<CustomAuthenticationStateProvider> logger) : AuthenticationStateProvider
+    public class CustomAuthenticationStateProvider(CustomHttpClient customHttpClient, ProtectedLocalStorage protectedLocalStorage, ILogger<CustomAuthenticationStateProvider> logger) : AuthenticationStateProvider
     {
-        private readonly CustomHttpClient _customHttpClient = customhttpClient;
-        private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
+        private readonly CustomHttpClient _customHttpClient = customHttpClient;
+        private readonly ProtectedLocalStorage _protectedLocalStorage = protectedLocalStorage;
         private readonly ILogger<CustomAuthenticationStateProvider> _logger = logger;
 
         public override async Task<AuthenticationState> GetAuthenticationStateAsync()
         {
             try
             {
-                var context = _httpContextAccessor.HttpContext;
-                var token = context?.Request.Cookies["AuthToken"];
-
-                if (string.IsNullOrEmpty(token))
+                // Récupérer le token depuis ProtectedLocalStorage
+                var result = await _protectedLocalStorage.GetAsync<string>("AuthToken");
+                if (!result.Success || string.IsNullOrEmpty(result.Value))
                 {
-                    _logger.LogInformation("No token found in cookies. Returning anonymous user.");
+                    _logger.LogInformation("No token found in ProtectedLocalStorage. Returning anonymous user.");
                     return CreateAnonymousState();
                 }
 
-                // Validate token with AuthService
+                var token = result.Value;
+
+                // Valider le token avec AuthService
                 var isValid = await ValidateTokenAsync();
                 if (!isValid)
                 {
@@ -44,13 +46,13 @@ namespace Frontend.Services
                 return CreateAnonymousState();
             }
         }
+
         private async Task<bool> ValidateTokenAsync()
         {
             try
             {
                 _logger.LogInformation("Sending request to AuthService to validate token.");
 
-                // Effectue une requête GET via CustomHttpClient
                 var response = await _customHttpClient.GetAsync("/auth/validate-token");
 
                 if (response.IsSuccessStatusCode)
@@ -106,21 +108,39 @@ namespace Frontend.Services
             return base64.Length % 4 == 0 ? base64 : base64.PadRight(base64.Length + (4 - base64.Length % 4), '=');
         }
 
-        public void NotifyUserAuthentication(string token)
+        public async Task NotifyUserAuthenticationAsync(string token)
         {
-            _logger.LogInformation("Notifying user authentication with new token.");
-            var claims = ParseClaimsFromJwt(token);
-            var identity = new ClaimsIdentity(claims, "JwtAuth");
-            var user = new ClaimsPrincipal(identity);
+            try
+            {
+                _logger.LogInformation("Storing token in ProtectedLocalStorage.");
+                await _protectedLocalStorage.SetAsync("AuthToken", token);
 
-            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
+                var claims = ParseClaimsFromJwt(token);
+                var identity = new ClaimsIdentity(claims, "JwtAuth");
+                var user = new ClaimsPrincipal(identity);
+
+                NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(user)));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error storing token in ProtectedLocalStorage.");
+            }
         }
 
-        public void NotifyUserLogout()
+        public async Task NotifyUserLogout()
         {
-            _logger.LogInformation("Notifying user logout.");
-            var anonymous = new ClaimsPrincipal(new ClaimsIdentity());
-            NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(anonymous)));
+            try
+            {
+                _logger.LogInformation("Removing token from ProtectedLocalStorage and notifying logout.");
+                await _protectedLocalStorage.DeleteAsync("AuthToken");
+
+                var anonymous = new ClaimsPrincipal(new ClaimsIdentity());
+                NotifyAuthenticationStateChanged(Task.FromResult(new AuthenticationState(anonymous)));
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error removing token from ProtectedLocalStorage.");
+            }
         }
 
         private static AuthenticationState CreateAnonymousState()

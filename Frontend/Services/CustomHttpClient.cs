@@ -1,10 +1,12 @@
-﻿using System.Net.Http.Headers;
+﻿using Microsoft.AspNetCore.Components.Server.ProtectedBrowserStorage;
+using System.Net.Http.Headers;
 
 namespace Frontend.Services
 {
-    public class CustomHttpClient(HttpClient httpClient, IHttpContextAccessor httpContextAccessor, ILogger<CustomHttpClient> logger)
+    public class CustomHttpClient(HttpClient httpClient, IHttpContextAccessor httpContextAccessor, ProtectedLocalStorage protectedLocalStorage, ILogger<CustomHttpClient> logger)
     {
         private readonly HttpClient _httpClient = httpClient;
+        private readonly ProtectedLocalStorage _protectedLocalStorage = protectedLocalStorage;
         private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
         private readonly ILogger<CustomHttpClient> _logger = logger;
 
@@ -12,7 +14,7 @@ namespace Frontend.Services
         {
             try
             {
-                AddAuthorizationHeader();
+                await AddAuthorizationHeader();
                 _logger.LogInformation("Sending GET request to {RequestUri}", requestUri);
                 var response = await _httpClient.GetAsync(requestUri);
                 _logger.LogInformation("Received response for GET request to {RequestUri}: {StatusCode}", requestUri, response.StatusCode);
@@ -29,7 +31,7 @@ namespace Frontend.Services
         {
             try
             {
-                AddAuthorizationHeader();
+                await AddAuthorizationHeader();
                 _logger.LogInformation("Sending POST request to {RequestUri} with content of type {ContentType}", requestUri, typeof(T).Name);
                 var response = await _httpClient.PostAsJsonAsync(requestUri, content);
                 _logger.LogInformation("Received response for POST request to {RequestUri}: {StatusCode}", requestUri, response.StatusCode);
@@ -42,24 +44,26 @@ namespace Frontend.Services
             }
         }
 
-        private void AddAuthorizationHeader()
+        private async Task AddAuthorizationHeader()
         {
             try
             {
-                var token = _httpContextAccessor.HttpContext?.Request.Cookies["AuthToken"];
-                if (!string.IsNullOrEmpty(token))
+
+                var result = await _protectedLocalStorage.GetAsync<string>("AuthToken");
+                if (!result.Success || string.IsNullOrEmpty(result.Value))
                 {
-                    _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
-                    _logger.LogInformation("Authorization header added to the request.");
+                    _logger.LogInformation("No token found in ProtectedLocalStorage. Returning anonymous user");
                 }
-                else
-                {
-                    _logger.LogWarning("No AuthToken found in cookies. Authorization header not added.");
-                }
+
+                var token = result.Value;
+
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                _logger.LogInformation("Authorization header added to the request");
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while adding Authorization header.");
+                _logger.LogError(ex, "Error occurred while adding Authorization header");
                 throw;
             }
         }

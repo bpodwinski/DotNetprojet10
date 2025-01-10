@@ -138,6 +138,12 @@
   <data name="Cancel" xml:space="preserve">
     <value>Annuler</value>
   </data>
+  <data name="CausedBy" xml:space="preserve">
+    <value>Causé par</value>
+  </data>
+  <data name="Diabete" xml:space="preserve">
+    <value>Diabète</value>
+  </data>
   <data name="FirstName" xml:space="preserve">
     <value>Prénom</value>
   </data>
@@ -150,8 +156,17 @@
   <data name="LastName" xml:space="preserve">
     <value>Nom</value>
   </data>
+  <data name="Login" xml:space="preserve">
+    <value>Se connecter</value>
+  </data>
+  <data name="Logout" xml:space="preserve">
+    <value>Se déconnecter</value>
+  </data>
   <data name="Notes" xml:space="preserve">
     <value>Notes</value>
+  </data>
+  <data name="Password" xml:space="preserve">
+    <value>Mot de passe</value>
   </data>
   <data name="PatientInfos" xml:space="preserve">
     <value>Information du patient</value>
@@ -161,5 +176,8 @@
   </data>
   <data name="Phone" xml:space="preserve">
     <value>Téléphone</value>
+  </data>
+  <data name="Username" xml:space="preserve">
+    <value>Nom d'utilisateur</value>
   </data>
 </root>

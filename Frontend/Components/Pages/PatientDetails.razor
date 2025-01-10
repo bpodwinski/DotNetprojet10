@@ -39,7 +39,9 @@
         <Notes PatientId="PatientId" />
     </div>
 
-    <button class="btn btn-secondary mt-4" @onclick="GoBack">@Localizer["Back"]</button>
+    <div class="col-md-12 col-lg-12">
+        <button class="btn btn-secondary mt-4" @onclick="GoBack">@Localizer["Back"]</button>
+    </div>
 }
 else if (isLoading)
 {
