@@ -11,6 +11,9 @@ using AuthService.Services;
 using Serilog;
 using System.Reflection;
 using System.Text;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
+using Microsoft.IdentityModel.JsonWebTokens;
 
 var builder = WebApplication.CreateBuilder(args);
 ConfigurationManager configuration = builder.Configuration;
@@ -20,9 +23,16 @@ builder.Configuration
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .AddJsonFile($"appsettings{environment}.json", optional: true);
 
-// Configure Serilog to write logs to a file
+//  Load .env file if environment is not Docker
+if (!string.Equals(environment, "Docker", StringComparison.OrdinalIgnoreCase))
+{
+    DotNetEnv.Env.Load();
+}
+
+// Configure Serilog
 Log.Logger = new LoggerConfiguration()
-    .WriteTo.File("AuthService.log", rollingInterval: RollingInterval.Day) // One file per day
+    .WriteTo.Console()
+    .WriteTo.File("AuthService_.log", rollingInterval: RollingInterval.Day)
     .CreateLogger();
 builder.Host.UseSerilog();
 
@@ -115,6 +125,63 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
             ClockSkew = TimeSpan.Zero
         };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = async context =>
+            {
+                try
+                {
+                    var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+                    var userManager = context.HttpContext.RequestServices.GetRequiredService<UserManager<UserDomain>>();
+                    var jwtService = context.HttpContext.RequestServices.GetRequiredService<IJwtService>();
+
+                    logger.LogInformation("Token validation started.");
+
+                    var userId = context.Principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                    if (string.IsNullOrEmpty(userId))
+                    {
+                        logger.LogWarning("Token validation failed: User ID is missing.");
+                        context.Fail("Invalid token: User ID is missing.");
+                        return;
+                    }
+
+                    var user = await userManager.FindByIdAsync(userId);
+                    if (user == null)
+                    {
+                        logger.LogWarning("Token validation failed: User not found for ID {UserId}.", userId);
+                        context.Fail("Invalid token: User not found.");
+                        return;
+                    }
+
+                    if (context.SecurityToken is JsonWebToken token)
+                    {
+                        logger.LogInformation("Checking if token is revoked.");
+                        var isRevoked = await jwtService.IsTokenRevoked(user, token.UnsafeToString());
+                        if (isRevoked)
+                        {
+                            logger.LogWarning("Token validation failed: Token has been revoked.");
+                            context.Fail("Token has been revoked.");
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        logger.LogWarning("Token validation failed: SecurityToken is not a JwtSecurityToken.");
+                        context.Fail("Invalid token: SecurityToken is invalid.");
+                        return;
+                    }
+
+                    logger.LogInformation("Token validation succeeded.");
+                }
+                catch (Exception ex)
+                {
+                    var logger = context.HttpContext.RequestServices.GetRequiredService<ILogger<Program>>();
+                    logger.LogError(ex, "An error occurred during token validation.");
+                    context.Fail($"An error occurred during token validation: {ex.Message}");
+                }
+            }
+        };
     });
 
 // Authorization policies
@@ -138,7 +205,8 @@ builder.Services.AddAuthorization(options =>
 // Register repositories and services
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IUserService, UserService>();
-builder.Services.AddScoped<IAuthService, AuthService.Services.AuthService>();
+builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 
 var app = builder.Build();
 

@@ -7,16 +7,10 @@ namespace AuthService.Repositories
     /// <summary>
     /// Repository class for managing User entities in the database.
     /// </summary>
-    public class UserRepository : IUserRepository
+    public class UserRepository(LocalDbContext dbContext, ILogger<UserRepository> logger) : IUserRepository
     {
-        private readonly LocalDbContext _dbContext;
-        private readonly ILogger<UserRepository> _logger;
-
-        public UserRepository(LocalDbContext dbContext, ILogger<UserRepository> logger)
-        {
-            _dbContext = dbContext;
-            _logger = logger;
-        }
+        private readonly LocalDbContext _dbContext = dbContext;
+        private readonly ILogger<UserRepository> _logger = logger;
 
         /// <summary>
         /// Asynchronously retrieves all User entities from the database.

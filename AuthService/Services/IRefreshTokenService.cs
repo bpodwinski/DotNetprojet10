@@ -1,12 +1,11 @@
 ﻿using AuthService.Domain;
-using System.Security.Claims;
 
 namespace AuthService.Services
 {
     /// <summary>
-    /// Interface to define methods for authentication token management, including JWT and refresh token handling.
+    /// Interface to define methods for refresh token handling.
     /// </summary>
-    public interface IAuthService
+    public interface IRefreshTokenService
     {
         /// <summary>
         /// Adds a refresh token and its expiry time for a user.
@@ -32,28 +31,13 @@ namespace AuthService.Services
         /// <summary>
         /// Revokes (removes) the refresh token and its expiration for a specific user.
         /// </summary>
-        /// <param name="user">The user whose refresh token is being revoked.</param>
-        Task RevokeRefreshToken(UserDomain user);
+        /// <param name="userId">The user ID whose refresh token is being revoked.</param>
+        Task RevokeRefreshToken(int userId);
 
         /// <summary>
         /// Generates a new refresh token using a secure random number generator.
         /// </summary>
         /// <returns>A Base64-encoded string representing the generated refresh token.</returns>
         string GenerateRefreshToken();
-
-        /// <summary>
-        /// Generates a new JWT token for the specified user and includes custom claims.
-        /// </summary>
-        /// <param name="user">The user for whom the JWT is being generated.</param>
-        /// <param name="additionalClaims">Additional claims to be included in the token.</param>
-        /// <returns>A string representing the generated JWT token.</returns>
-        string GenerateToken(UserDomain user, IList<Claim> additionalClaims);
-
-        /// <summary>
-        /// Extracts the principal from an expired JWT token.
-        /// </summary>
-        /// <param name="token">The expired JWT token.</param>
-        /// <returns>The claims principal extracted from the token.</returns>
-        ClaimsPrincipal GetPrincipalFromExpiredToken(string token);
     }
 }

@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Identity;
-using AuthService.Controllers;
 using AuthService.Domain;
 using AuthService.DTOs;
 using AuthService.Repositories;
@@ -7,19 +6,11 @@ using System.Security.Claims;
 
 namespace AuthService.Services
 {
-    public class UserService : IUserService
+    public class UserService(IUserRepository userRepository, UserManager<UserDomain> userManager, ILogger<UserService> logger) : IUserService
     {
-        private readonly IUserRepository _userRepository;
-        private readonly UserManager<UserDomain> _userManager;
-        private readonly IAuthService _authService;
-        private readonly ILogger<UserController> _logger;
-
-        public UserService(IUserRepository userRepository, UserManager<UserDomain> userManager, ILogger<UserController> logger)
-        {
-            _userRepository = userRepository;
-            _userManager = userManager;
-            _logger = logger;
-        }
+        private readonly IUserRepository _userRepository = userRepository;
+        private readonly UserManager<UserDomain> _userManager = userManager;
+        private readonly ILogger<UserService> _logger = logger;
 
         /// <summary>
         /// Creates a new user based on the provided dto.
