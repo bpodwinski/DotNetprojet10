@@ -5,6 +5,7 @@ using AuthService.Domain;
 using AuthService.Models;
 using AuthService.Services;
 using System.Security.Claims;
+using Microsoft.IdentityModel.Tokens;
 
 namespace AuthService.Controllers
 {
@@ -130,6 +131,51 @@ namespace AuthService.Controllers
             catch (Exception ex)
             {
                 return StatusCode(500, $"An error occurred during logout: {ex.Message}");
+            }
+        }
+
+        [HttpGet("validate-token")]
+        public async Task<IActionResult> ValidateToken()
+        {
+            try
+            {
+                var authHeader = HttpContext.Request.Headers["Authorization"].ToString();
+                if (string.IsNullOrEmpty(authHeader) || !authHeader.StartsWith("Bearer "))
+                {
+                    return Unauthorized("Missing or invalid Authorization header");
+                }
+
+                var token = authHeader["Bearer ".Length..];
+                var principal = _jwtService.GetPrincipalFromExpiredToken(token);
+
+                var userId = principal?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized("Invalid token: User ID is missing");
+                }
+
+                var user = await _userManager.FindByIdAsync(userId);
+                if (user == null)
+                {
+                    return Unauthorized("Invalid token: User not found");
+                }
+
+                // Vérifie si le token a été révoqué
+                var isRevoked = await _jwtService.IsTokenRevoked(user, token);
+                if (isRevoked)
+                {
+                    return Unauthorized("Token has been revoked");
+                }
+
+                return Ok("Token is valid.");
+            }
+            catch (SecurityTokenException ex)
+            {
+                return Unauthorized(new { message = "Invalid token", details = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "An error occurred during token validation.", details = ex.Message });
             }
         }
 
