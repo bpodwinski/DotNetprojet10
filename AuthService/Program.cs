@@ -11,7 +11,6 @@ using AuthService.Services;
 using Serilog;
 using System.Reflection;
 using System.Text;
-using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.IdentityModel.JsonWebTokens;
 

@@ -1,4 +1,4 @@
-﻿@page "/Account/Login"
+﻿@page "/account/login"
 
 @using System.ComponentModel.DataAnnotations
 @using Microsoft.AspNetCore.Authentication
@@ -6,63 +6,45 @@
 @using Frontend.Data
 @using System.Text;
 @using System.Text.Json;
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.Extensions.Localization
+@using Frontend.Services
+@using Frontend.Locales
 
 @inject SignInManager<ApplicationUser> SignInManager
 @inject ILogger<Login> Logger
 @inject NavigationManager NavigationManager
 @inject IdentityRedirectManager RedirectManager
 @inject HttpClient HttpClient
+@inject IStringLocalizer<Resource> Localizer
+@inject CustomAuthenticationStateProvider AuthStateProvider
+@inject CustomHttpClient CustomHttpClient
 
-<PageTitle>Log in</PageTitle>
+<PageTitle>@Localizer["Login"]</PageTitle>
 
-<h1>Log in</h1>
+<h1>@Localizer["Login"]</h1>
+
 <div class="row">
     <div class="col-lg-6">
         <section>
             <StatusMessage Message="@errorMessage" />
             <EditForm Model="Input" method="post" OnValidSubmit="LoginUser" FormName="login">
                 <DataAnnotationsValidator />
-                <h2>Use a local account to log in.</h2>
-                <hr />
                 <ValidationSummary class="text-danger" role="alert" />
                 <div class="form-floating mb-3">
-                    <InputText @bind-Value="Input.UserName" id="Input.UserName" class="form-control" autocomplete="username" aria-required="true" placeholder="user" />
-                    <label for="Input.UserName" class="form-label">UserName</label>
+                    <InputText @bind-Value="Input.UserName" id="Input.UserName" class="form-control" autocomplete="username" aria-required="true" placeholder="@Localizer["Username"]" />
+                    <label for="Input.UserName" class="form-label">@Localizer["Username"]</label>
                     <ValidationMessage For="() => Input.UserName" class="text-danger" />
                 </div>
                 <div class="form-floating mb-3">
-                    <InputText type="password" @bind-Value="Input.Password" id="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="password" />
-                    <label for="Input.Password" class="form-label">Password</label>
+                    <InputText type="password" @bind-Value="Input.Password" id="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="@Localizer["Password"]" />
+                    <label for="Input.Password" class="form-label">@Localizer["Password"]</label>
                     <ValidationMessage For="() => Input.Password" class="text-danger" />
                 </div>
-                <div class="checkbox mb-3">
-                    <label class="form-label">
-                        <InputCheckbox @bind-Value="Input.RememberMe" class="darker-border-checkbox form-check-input" />
-                        Remember me
-                    </label>
-                </div>
                 <div>
-                    <button type="submit" class="w-100 btn btn-lg btn-primary">Log in</button>
-                </div>
-                <div>
-                    <p>
-                        <a href="Account/ForgotPassword">Forgot your password?</a>
-                    </p>
-                    <p>
-                        <a href="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))">Register as a new user</a>
-                    </p>
-                    <p>
-                        <a href="Account/ResendEmailConfirmation">Resend email confirmation</a>
-                    </p>
+                    <button type="submit" class="w-100 btn btn-lg btn-primary">@Localizer["Login"]</button>
                 </div>
             </EditForm>
-        </section>
-    </div>
-    <div class="col-lg-4 col-lg-offset-2">
-        <section>
-            <h3>Use another service to log in.</h3>
-            <hr />
-            <ExternalLoginPicker />
         </section>
     </div>
 </div>
@@ -83,7 +65,7 @@
     {
         if (HttpMethods.IsGet(HttpContext.Request.Method))
         {
-            // Clear the existing external cookie to ensure a clean login process
+            // Clear existing external cookie to ensure clean login process
             await HttpContext.SignOutAsync(IdentityConstants.ExternalScheme);
         }
     }
@@ -92,18 +74,13 @@
     {
         try
         {
-            // Préparer le contenu JSON
             var loginData = new
             {
                 username = Input.UserName,
                 password = Input.Password
             };
 
-            var jsonContent = JsonSerializer.Serialize(loginData);
-            var httpContent = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-
-            // Envoyer la requête POST
-            var response = await HttpClient.PostAsync("http://gateway:5000/auth/login", httpContent);
+            var response = await CustomHttpClient.PostAsync("auth/login", loginData);
 
             if (response.IsSuccessStatusCode)
             {
@@ -115,31 +92,35 @@
 
                 if (loginResponse != null && !string.IsNullOrEmpty(loginResponse.Token))
                 {
-                    // Ajouter le token au cookie
+                    // Store JWT token in cookie
                     HttpContext.Response.Cookies.Append("AuthToken", loginResponse.Token, new CookieOptions
                         {
                             HttpOnly = true,
                             Secure = true,
                             SameSite = SameSiteMode.Strict,
-                            Expires = DateTimeOffset.UtcNow.AddHours(1) // Ajustez selon la durée de vie du token
+                            Expires = DateTimeOffset.UtcNow.AddHours(1)
                         });
 
                     Logger.LogInformation("User logged in.");
+
+                    // Notify authentication state provider
+                    AuthStateProvider.NotifyUserAuthentication(loginResponse.Token);
+                    StateHasChanged();
                 }
                 else
                 {
-                    errorMessage = "Error: Unable to retrieve authentication token.";
+                    errorMessage = Localizer["ErrorUnableToRetrieveToken"];
                 }
             }
             else
             {
-                errorMessage = "Error: Invalid login attempt.";
+                errorMessage = Localizer["ErrorInvalidLogin"];
             }
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Error during login process.");
-            errorMessage = "An error occurred during login. Please try again later.";
+            errorMessage = Localizer["ErrorGenericLogin"];
         }
     }
 
@@ -151,9 +132,6 @@
         [Required]
         [DataType(DataType.Password)]
         public string Password { get; set; } = "";
-
-        [Display(Name = "Remember me?")]
-        public bool RememberMe { get; set; }
     }
 
     private class LoginResponse

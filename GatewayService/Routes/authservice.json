@@ -22,5 +22,17 @@
     ],
     "UpstreamPathTemplate": "/auth/logout",
     "UpstreamHttpMethod": [ "POST" ]
+  },
+  {
+    "DownstreamPathTemplate": "/auth/validate-token",
+    "DownstreamScheme": "http",
+    "DownstreamHostAndPorts": [
+      {
+        "Host": "authservice",
+        "Port": 8080
+      }
+    ],
+    "UpstreamPathTemplate": "/auth/validate-token",
+    "UpstreamHttpMethod": [ "GET" ]
   }
 ]

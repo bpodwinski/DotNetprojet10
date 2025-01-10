@@ -3,9 +3,12 @@
 @using Microsoft.Extensions.Localization
 @using System.Globalization
 @using Frontend.Locales
+@using Frontend.Services
 
 @inject IStringLocalizer<Resource> Localizer
 @inject NavigationManager NavigationManager
+@inject CustomHttpClient CustomHttpClient
+@inject CustomAuthenticationStateProvider AuthStateProvider
 
 <div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
@@ -18,28 +21,21 @@
 <div class="nav-scrollable" onclick="document.querySelector('.navbar-toggler').click()">
     <nav class="nav flex-column">
 
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="patients">
-                <span class="bi bi-person-lines-fill" aria-hidden="true"></span> @Localizer["Patients"]
-            </NavLink>
-        </div>
-
         <AuthorizeView>
             <Authorized>
                 <div class="nav-item px-3">
-                    <form action="Account/Logout" method="post">
-                        <AntiforgeryToken />
-                        <input type="hidden" name="ReturnUrl" value="@currentUrl" />
-                        <button type="submit" class="nav-link">
-                            <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> Logout
-                        </button>
-                    </form>
+                    <NavLink class="nav-link" href="patients">
+                        <span class="bi bi-person-lines-fill" aria-hidden="true"></span> @Localizer["Patients"]
+                    </NavLink>
+                    <button class="nav-link" @onclick="Logout">
+                        <span class="bi bi-arrow-bar-left-nav-menu" aria-hidden="true"></span> @Localizer["Logout"]
+                    </button>
                 </div>
             </Authorized>
             <NotAuthorized>
                 <div class="nav-item px-3">
                     <NavLink class="nav-link" href="Account/Login">
-                        <span class="bi bi-person-badge-nav-menu" aria-hidden="true"></span> Login
+                        <span class="bi bi-person-badge-nav-menu" aria-hidden="true"></span> @Localizer["Login"]
                     </NavLink>
                 </div>
             </NotAuthorized>
@@ -66,5 +62,28 @@
     {
         NavigationManager.LocationChanged -= OnLocationChanged;
     }
-}
 
+    private async Task Logout()
+    {
+        try
+        {
+            var response = await CustomHttpClient.PostAsync<object>("auth/logout", "");
+
+            if (response.IsSuccessStatusCode)
+            {
+                // Notify authentication state provider
+                AuthStateProvider.NotifyUserLogout();
+
+                NavigationManager.NavigateTo("Account/Login", true);
+            }
+            else
+            {
+                Console.WriteLine($"Erreur lors de la déconnexion : {response.StatusCode}");
+            }
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Erreur lors de la déconnexion : {ex.Message}");
+        }
+    }
+}

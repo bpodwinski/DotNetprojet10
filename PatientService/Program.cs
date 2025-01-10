@@ -4,6 +4,7 @@ using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using PatientService.Data;
+using PatientService.Middlewares;
 using PatientService.Repositories;
 using PatientService.Services;
 using Serilog;
@@ -17,6 +18,12 @@ var environment = builder.Environment.EnvironmentName;
 builder.Configuration
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .AddJsonFile($"appsettings{environment}.json", optional: true);
+
+//  Load .env file if environment is not Docker
+if (!string.Equals(environment, "Docker", StringComparison.OrdinalIgnoreCase))
+{
+    DotNetEnv.Env.Load();
+}
 
 // Configure Serilog to write logs to a file
 Log.Logger = new LoggerConfiguration()
@@ -82,6 +89,17 @@ builder.Services.AddSwaggerGen(options =>
 builder.Services.AddDbContext<LocalDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
+// Register HttpClient for AuthService communication
+builder.Services.AddHttpClient("AuthService", client =>
+{
+    var authServiceBaseUrl = builder.Configuration["AuthService:BaseUrl"];
+    if (string.IsNullOrEmpty(authServiceBaseUrl))
+    {
+        throw new Exception("AuthService base URL is not configured.");
+    }
+    client.BaseAddress = new Uri(authServiceBaseUrl);
+});
+
 // Configure JWT Authentication
 IdentityModelEventSource.ShowPII = true;
 
@@ -104,7 +122,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ValidateIssuerSigningKey = true,
             ValidateIssuer = true,
             ValidateAudience = true,
-            ValidateLifetime = true,
+            ValidateLifetime = false,
             ValidIssuer = issuer,
             ValidAudience = audience,
             IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secretKey)),
@@ -135,6 +153,9 @@ builder.Services.AddScoped<IPatientRepository, PatientRepository>();
 builder.Services.AddScoped<IPatientService, PatientService.Services.PatientService>();
 
 var app = builder.Build();
+
+// Apply token validation middleware before authentication and authorization
+app.UseMiddleware<TokenValidationMiddleware>();
 
 // Ensure database is migrated in Development mode
 if (app.Environment.IsDevelopment())
