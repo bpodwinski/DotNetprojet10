@@ -162,6 +162,15 @@
   <data name="Logout" xml:space="preserve">
     <value>Logout</value>
   </data>
+  <data name="NoteAddedError" xml:space="preserve">
+    <value>NoteAddedError</value>
+  </data>
+  <data name="NoteAddedFailed" xml:space="preserve">
+    <value>NoteAddedFailed</value>
+  </data>
+  <data name="NoteAddedSuccess" xml:space="preserve">
+    <value>NoteAddedSuccess</value>
+  </data>
   <data name="NoteFrom" xml:space="preserve">
     <value>NoteFrom</value>
   </data>

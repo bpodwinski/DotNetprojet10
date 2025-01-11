@@ -1,0 +1,69 @@
+﻿<div id="@ToastId" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="toast-header">
+        <strong class="me-auto">@Title</strong>
+        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close" @onclick="CloseToast"></button>
+    </div>
+    <div class="toast-body">
+        @Message
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public string ToastId { get; set; } = $"toast-{Guid.NewGuid()}";
+
+    [Parameter]
+    public string Title { get; set; } = "Notification";
+
+    [Parameter]
+    public string Message { get; set; } = string.Empty;
+
+    [Parameter]
+    public EventCallback OnToastClosed { get; set; }
+
+    [Inject]
+    private IJSRuntime JSRuntime { get; set; } = default!;
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            await ShowToast();
+        }
+    }
+
+    public async Task ShowToast()
+    {
+        try
+        {
+            var toastInstance = await JSRuntime.InvokeAsync<IJSObjectReference>(
+                "bootstrap.Toast.getOrCreateInstance",
+                $"#{ToastId}"
+            );
+            await toastInstance.InvokeVoidAsync("show");
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[Toast Component] Error showing toast: {ex.Message}");
+        }
+    }
+
+    public async Task HideToast()
+    {
+        try
+        {
+            var toastInstance = await JSRuntime.InvokeAsync<IJSObjectReference>("bootstrap.Toast.getOrCreateInstance", $"#{ToastId}");
+            await toastInstance.InvokeVoidAsync("hide");
+            await OnToastClosed.InvokeAsync();
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"[Toast Component] Error hiding toast: {ex.Message}");
+        }
+    }
+
+    private async Task CloseToast()
+    {
+        await HideToast();
+    }
+}

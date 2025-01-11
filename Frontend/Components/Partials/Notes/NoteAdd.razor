@@ -6,9 +6,11 @@
 @using Frontend.Locales
 @using System.Net.Http.Json;
 @using System.ComponentModel.DataAnnotations;
+@using Layout
 
 @inject CustomHttpClient CustomHttpClient
 @inject IStringLocalizer<Resource> Localizer
+@inject IJSRuntime JSRuntime
 
 <PageTitle>@Localizer["AddNote"]</PageTitle>
 
@@ -30,12 +32,10 @@
     </div>
 </div>
 
-@if (!string.IsNullOrEmpty(statusMessage))
-{
-    <p class="alert alert-info mt-3">@statusMessage</p>
-}
-
 @code {
+    [CascadingParameter]
+    private MainLayout Layout { get; set; } = default!;
+
     [Parameter]
     public int? PatientId { get; set; }
 
@@ -52,18 +52,16 @@
             var response = await CustomHttpClient.PostAsync("notes", newNote);
             if (response.IsSuccessStatusCode)
             {
-                statusMessage = Localizer["NoteAdded"];
-
-                await OnNoteAdded.InvokeAsync();
+                Layout.ShowToast(Localizer["NoteAddedSuccess"], "The note has been successfully added");
             }
             else
             {
-                statusMessage = Localizer["ErrorAddingNote"];
+                Layout.ShowToast(Localizer["NoteAddedFailed"], "The note has been successfully added");
             }
         }
         catch (Exception ex)
         {
-            statusMessage = $"{Localizer["ErrorAddingNote"]}: {ex.Message}";
+            statusMessage = $"{Localizer["NoteAddedError"]}: {ex.Message}";
         }
     }
 

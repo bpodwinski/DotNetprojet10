@@ -162,6 +162,15 @@
   <data name="Logout" xml:space="preserve">
     <value>Se déconnecter</value>
   </data>
+  <data name="NoteAddedError" xml:space="preserve">
+    <value>Ajout de la note a échoué</value>
+  </data>
+  <data name="NoteAddedFailed" xml:space="preserve">
+    <value>Ajout de la note a échoué</value>
+  </data>
+  <data name="NoteAddedSuccess" xml:space="preserve">
+    <value>Note ajoutée</value>
+  </data>
   <data name="NoteFrom" xml:space="preserve">
     <value>Note du</value>
   </data>
