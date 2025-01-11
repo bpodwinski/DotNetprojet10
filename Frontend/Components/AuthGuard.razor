@@ -1,0 +1,35 @@
+﻿@using Frontend.Services
+
+@inject CustomAuthenticationStateProvider AuthStateProvider
+@inject NavigationManager NavigationManager
+
+@if (isAuthenticated)
+{
+    @ChildContent
+}
+
+@code {
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    private bool isAuthenticated;
+    private bool isRedirectionPending = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+        isAuthenticated = authState.User.Identity?.IsAuthenticated ?? false;
+
+        if (!isAuthenticated)
+        {
+            isRedirectionPending = true;
+        }
+    }
+
+    protected override void OnAfterRender(bool firstRender)
+    {
+        if (isRedirectionPending)
+        {
+            isRedirectionPending = false;
+            NavigationManager.NavigateTo("login", true);
+        }
+    }
+}

@@ -15,7 +15,6 @@ namespace Frontend.Services
         {
             try
             {
-                // Récupérer le token depuis ProtectedLocalStorage
                 var result = await _protectedLocalStorage.GetAsync<string>("AuthToken");
                 if (!result.Success || string.IsNullOrEmpty(result.Value))
                 {
@@ -25,7 +24,6 @@ namespace Frontend.Services
 
                 var token = result.Value;
 
-                // Valider le token avec AuthService
                 var isValid = await ValidateTokenAsync();
                 if (!isValid)
                 {

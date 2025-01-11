@@ -11,54 +11,56 @@
 @inject IStringLocalizer<Resource> Localizer
 @inject NavigationManager NavigationManager
 
-<PageTitle>@Localizer["PatientAdd"]</PageTitle>
+<AuthGuard>
+    <PageTitle>@Localizer["PatientAdd"]</PageTitle>
 
-<h1>@Localizer["AddPatient"]</h1>
+    <h1>@Localizer["AddPatient"]</h1>
 
-<div class="d-flex align-items-center justify-content-center">
-    <div class="card" style="width: 640px;">
-        <div class="card-body">
-            <EditForm Model="newPatient" OnValidSubmit="HandleValidSubmit">
-                <DataAnnotationsValidator />
-                <ValidationSummary />
+    <div class="d-flex align-items-center justify-content-center">
+        <div class="card" style="width: 640px;">
+            <div class="card-body">
+                <EditForm Model="newPatient" OnValidSubmit="HandleValidSubmit">
+                    <DataAnnotationsValidator />
+                    <ValidationSummary />
 
-                <div class="mb-3">
-                    <label class="form-label">@Localizer["FirstName"]</label>
-                    <InputText @bind-Value="newPatient.FirstName" class="form-control" />
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">@Localizer["LastName"]</label>
-                    <InputText @bind-Value="newPatient.LastName" class="form-control" />
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">@Localizer["BirthDate"]</label>
-                    <InputDate @bind-Value="newPatient.DateOfBirth" class="form-control"
-                               min="1900-01-01" max="@MaxDate.ToString("yyyy-MM-dd")" />
-                    <ValidationMessage For="() => newPatient.DateOfBirth" />
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">@Localizer["Gender"]</label>
-                    <InputSelect @bind-Value="newPatient.Gender" class="form-control">
-                        <option value="Male">@Localizer["Male"]</option>
-                        <option value="Female">@Localizer["Female"]</option>
-                    </InputSelect>
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">@Localizer["Address"]</label>
-                    <InputText @bind-Value="newPatient.Address" class="form-control" />
-                </div>
-                <div class="mb-3">
-                    <label class="form-label">@Localizer["Phone"]</label>
-                    <InputText @bind-Value="newPatient.PhoneNumber" class="form-control" />
-                    <ValidationMessage For="() => newPatient.PhoneNumber" />
-                </div>
+                    <div class="mb-3">
+                        <label class="form-label">@Localizer["FirstName"]</label>
+                        <InputText @bind-Value="newPatient.FirstName" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">@Localizer["LastName"]</label>
+                        <InputText @bind-Value="newPatient.LastName" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">@Localizer["BirthDate"]</label>
+                        <InputDate @bind-Value="newPatient.DateOfBirth" class="form-control"
+                                   min="1900-01-01" max="@MaxDate.ToString("yyyy-MM-dd")" />
+                        <ValidationMessage For="() => newPatient.DateOfBirth" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">@Localizer["Gender"]</label>
+                        <InputSelect @bind-Value="newPatient.Gender" class="form-control">
+                            <option value="Male">@Localizer["Male"]</option>
+                            <option value="Female">@Localizer["Female"]</option>
+                        </InputSelect>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">@Localizer["Address"]</label>
+                        <InputText @bind-Value="newPatient.Address" class="form-control" />
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">@Localizer["Phone"]</label>
+                        <InputText @bind-Value="newPatient.PhoneNumber" class="form-control" />
+                        <ValidationMessage For="() => newPatient.PhoneNumber" />
+                    </div>
 
-                <button type="button" class="btn btn-secondary" @onclick="GoBack">@Localizer["Cancel"]</button>
-                <button type="submit" class="btn btn-primary">@Localizer["Add"]</button>
-            </EditForm>
+                    <button type="button" class="btn btn-secondary" @onclick="GoBack">@Localizer["Cancel"]</button>
+                    <button type="submit" class="btn btn-primary">@Localizer["Add"]</button>
+                </EditForm>
+            </div>
         </div>
     </div>
-</div>
+</AuthGuard>
 
 @if (!string.IsNullOrEmpty(statusMessage))
 {

@@ -13,44 +13,46 @@
 @inject IStringLocalizer<Resource> Localizer
 @inject NavigationManager NavigationManager
 
-<PageTitle>@Localizer["PatientDetails"]</PageTitle>
+<AuthGuard>
+    <PageTitle>@Localizer["PatientDetails"]</PageTitle>
 
-@if (patient != null)
-{
-    <h1 class="text-center mb-5">@patient.FirstName @patient.LastName</h1>
+    @if (patient != null)
+    {
+        <h1 class="text-center mb-5">@patient.FirstName @patient.LastName</h1>
 
-    <div class="col-md-12 col-lg-4 mb-4">
-        <h2>@Localizer["PatientInfos"]</h2>
+        <div class="col-md-12 col-lg-4 mb-4">
+            <h2>@Localizer["PatientInfos"]</h2>
 
-        <div class="card mb-4">
-            <div class="card-body">
-                <p class="card-text text-center"><strong>@Localizer["BirthDate"]:</strong> @patient.DateOfBirth.ToShortDateString()</p>
-                <p class="card-text text-center"><strong>@Localizer["Gender"]:</strong> @patient.Gender</p>
-                <p class="card-text text-center"><strong>@Localizer["Address"]:</strong> @patient.Address</p>
-                <p class="card-text text-center"><strong>@Localizer["Phone"]:</strong> @patient.PhoneNumber</p>
+            <div class="card mb-4">
+                <div class="card-body">
+                    <p class="card-text text-center"><strong>@Localizer["BirthDate"]:</strong> @patient.DateOfBirth.ToShortDateString()</p>
+                    <p class="card-text text-center"><strong>@Localizer["Gender"]:</strong> @patient.Gender</p>
+                    <p class="card-text text-center"><strong>@Localizer["Address"]:</strong> @patient.Address</p>
+                    <p class="card-text text-center"><strong>@Localizer["Phone"]:</strong> @patient.PhoneNumber</p>
+                </div>
             </div>
+
+            <DiabeteReport PatientId="PatientId" />
         </div>
 
-        <DiabeteReport PatientId="PatientId" />
-    </div>
+        <div class="col-md-12 col-lg-8">
+            <NoteAdd PatientId="PatientId" OnNoteAdded="RefreshNotes" />
+            <Notes @ref="notesComponent" PatientId="PatientId" />
+        </div>
 
-    <div class="col-md-12 col-lg-8">
-        <NoteAdd PatientId="PatientId" OnNoteAdded="RefreshNotes" />
-        <Notes @ref="notesComponent" PatientId="PatientId" />
-    </div>
-
-    <div class="col-md-12 col-lg-12">
-        <button class="btn btn-secondary mt-4" @onclick="GoBack">@Localizer["Back"]</button>
-    </div>
-}
-else if (isLoading)
-{
-    <Loading />
-}
-else
-{
-    <p>@Localizer["PatientNotFound"]</p>
-}
+        <div class="col-md-12 col-lg-12">
+            <button class="btn btn-secondary mt-4" @onclick="GoBack">@Localizer["Back"]</button>
+        </div>
+    }
+    else if (isLoading)
+    {
+        <Loading />
+    }
+    else
+    {
+        <p>@Localizer["PatientNotFound"]</p>
+    }
+</AuthGuard>
 
 @code {
     [Parameter]
