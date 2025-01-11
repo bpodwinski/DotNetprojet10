@@ -30,6 +30,9 @@
                 <td>@patient.Address</td>
                 <td>@patient.PhoneNumber</td>
                 <td>
+                    <button @onclick="(() => OnEdit.InvokeAsync(patient.Id))" class="btn btn-secondary" data-bs-toggle="tooltip" data-bs-title="@Localizer[" Edit"]">
+                        <i class="bi bi-pencil"></i>
+                    </button>
                     <button @onclick="(() => OnDelete.InvokeAsync(patient.Id))" class="btn btn-danger" data-bs-toggle="tooltip" data-bs-title="@Localizer[" Delete"]">
                         <i class="bi bi-trash"></i>
                     </button>
@@ -41,6 +44,7 @@
 
 @code {
     [Parameter] public List<Patient> Patients { get; set; } = new();
+    [Parameter] public EventCallback<int> OnEdit { get; set; }
     [Parameter] public EventCallback<int> OnDelete { get; set; }
     [Inject] private IStringLocalizer<Resource> Localizer { get; set; } = default!;
 }

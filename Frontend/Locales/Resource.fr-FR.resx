@@ -150,6 +150,9 @@
   <data name="Diabete" xml:space="preserve">
     <value>Diabète</value>
   </data>
+  <data name="Edit" xml:space="preserve">
+    <value>Editer</value>
+  </data>
   <data name="FirstName" xml:space="preserve">
     <value>Prénom</value>
   </data>

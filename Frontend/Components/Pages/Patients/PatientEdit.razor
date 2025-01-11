@@ -1,0 +1,171 @@
+﻿@page "/patients/edit/{PatientId:int}"
+
+@using Frontend.Models
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.Extensions.Localization
+@using Frontend.Services
+@using Frontend.Locales
+@using System.Text.Json
+@using System.ComponentModel.DataAnnotations;
+
+@inject CustomHttpClient CustomHttpClient
+@inject IStringLocalizer<Resource> Localizer
+@inject NavigationManager NavigationManager
+
+<AuthGuard>
+    <PageTitle>@Localizer["PatientEdit"]</PageTitle>
+
+    <h1>@Localizer["PatientEdit"]</h1>
+
+    @if (isLoading)
+    {
+        <Loading />
+    }
+    else if (hasError)
+    {
+        <p class="alert alert-danger">@Localizer["ErrorLoadingPatient"]</p>
+    }
+    else
+    {
+        <div class="d-flex align-items-center justify-content-center">
+            <div class="card" style="width: 640px;">
+                <div class="card-body">
+                    <EditForm Model="newPatient" OnValidSubmit="HandleValidSubmit">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary />
+
+                        <div class="mb-3">
+                            <label class="form-label">@Localizer["FirstName"]</label>
+                            <InputText @bind-Value="newPatient.FirstName" class="form-control" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">@Localizer["LastName"]</label>
+                            <InputText @bind-Value="newPatient.LastName" class="form-control" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">@Localizer["BirthDate"]</label>
+                            <InputDate @bind-Value="newPatient.DateOfBirth" class="form-control"
+                                       min="1900-01-01" max="@MaxDate.ToString("yyyy-MM-dd")" />
+                            <ValidationMessage For="() => newPatient.DateOfBirth" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">@Localizer["Gender"]</label>
+                            <InputSelect @bind-Value="newPatient.Gender" class="form-control">
+                                <option value="Male">@Localizer["Male"]</option>
+                                <option value="Female">@Localizer["Female"]</option>
+                            </InputSelect>
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">@Localizer["Address"]</label>
+                            <InputText @bind-Value="newPatient.Address" class="form-control" />
+                        </div>
+                        <div class="mb-3">
+                            <label class="form-label">@Localizer["Phone"]</label>
+                            <InputText @bind-Value="newPatient.PhoneNumber" class="form-control" />
+                            <ValidationMessage For="() => newPatient.PhoneNumber" />
+                        </div>
+
+                        <button type="button" class="btn btn-secondary" @onclick="GoBack">@Localizer["Cancel"]</button>
+                        <button type="submit" class="btn btn-primary">@Localizer["Edit"]</button>
+                    </EditForm>
+                </div>
+            </div>
+        </div>
+    }
+</AuthGuard>
+
+@if (!string.IsNullOrEmpty(statusMessage))
+{
+    <p class="alert alert-info mt-3">@statusMessage</p>
+}
+
+@code {
+    [Parameter]
+    public int PatientId { get; set; }
+
+    private Patient newPatient = new();
+    private string statusMessage = string.Empty;
+    private bool isLoading = true;
+    private bool hasError = false;
+    private DateTime MaxDate { get; set; } = DateTime.Today;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadPatientData();
+    }
+
+    private async Task LoadPatientData()
+    {
+        try
+        {
+            isLoading = true;
+            hasError = false;
+
+            var response = await CustomHttpClient.GetAsync($"patients/{PatientId}");
+            if (response.IsSuccessStatusCode)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                newPatient = JsonSerializer.Deserialize<Patient>(responseContent, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    }) ?? new Patient();
+            }
+            else
+            {
+                hasError = true;
+                statusMessage = Localizer["ErrorLoadingPatient"];
+            }
+        }
+        catch (Exception ex)
+        {
+            hasError = true;
+            statusMessage = $"{Localizer["ErrorLoadingPatient"]}: {ex.Message}";
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    private async Task HandleValidSubmit()
+    {
+        try
+        {
+            var response = await CustomHttpClient.PutAsync($"patients/{PatientId}", newPatient);
+            if (response.IsSuccessStatusCode)
+            {
+                statusMessage = Localizer["PatientEdited"];
+                NavigationManager.NavigateTo("/patients");
+            }
+            else
+            {
+                statusMessage = Localizer["ErrorEditingPatient"];
+            }
+        }
+        catch (Exception ex)
+        {
+            statusMessage = $"{Localizer["ErrorEditingPatient"]}: {ex.Message}";
+        }
+    }
+
+    private void GoBack()
+    {
+        NavigationManager.NavigateTo("/patients");
+    }
+
+    private class Patient
+    {
+        public string FirstName { get; set; } = string.Empty;
+        public string LastName { get; set; } = string.Empty;
+
+        [Required]
+        [DataType(DataType.Date)]
+        public DateTime DateOfBirth { get; set; }
+
+        public string Gender { get; set; } = string.Empty;
+        public string Address { get; set; } = string.Empty;
+
+        [RegularExpression(@"^\d{3}-\d{3}-\d{4}$|^\d{10}$", ErrorMessage = "Phone number must be in the format 111-222-3333 or 1112223333.")]
+        public string PhoneNumber { get; set; } = string.Empty;
+    }
+}

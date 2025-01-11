@@ -29,7 +29,7 @@
     }
     else if (patients.Any())
     {
-        <PatientTable Patients="patients" OnDelete="Delete" />
+        <PatientTable Patients="patients" OnEdit="Edit" OnDelete="Delete" />
     }
     else
     {
@@ -65,9 +65,9 @@
                 {
                     var responseContent = await response.Content.ReadAsStringAsync();
                     patients = JsonSerializer.Deserialize<List<Patient>>(responseContent, new JsonSerializerOptions
-                    {
-                        PropertyNameCaseInsensitive = true
-                    }) ?? new List<Patient>();
+                        {
+                            PropertyNameCaseInsensitive = true
+                        }) ?? new List<Patient>();
                 }
             }
             catch (Exception ex)
@@ -80,6 +80,16 @@
                 StateHasChanged();
             }
         }
+    }
+
+    private void Create()
+    {
+        NavigationManager.NavigateTo("/patients/add");
+    }
+
+    private void Edit(int id)
+    {
+        NavigationManager.NavigateTo($"/patients/edit/{id}");
     }
 
     private async Task Delete(int id)
@@ -102,10 +112,5 @@
         {
             Layout.ShowToast(Localizer["PatientDeletedError"], ex.Message);
         }
-    }
-
-    private void Create()
-    {
-        NavigationManager.NavigateTo("/patients/add");
     }
 }

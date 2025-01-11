@@ -1,5 +1,6 @@
 ﻿@page "/patients/{PatientId:int}"
 
+@using Frontend.Models
 @using Frontend.Components.Partials
 @using Frontend.Components.Partials.Diabete
 @using Microsoft.AspNetCore.Authorization
@@ -84,7 +85,7 @@
                     {
                         PropertyNameCaseInsensitive = true
                     });
-                dataLoaded = true; // Indiquer que les données sont chargées
+                dataLoaded = true;
             }
             else
             {
@@ -114,16 +115,5 @@
     private void GoBack()
     {
         NavigationManager.NavigateTo("/patients");
-    }
-
-    private class Patient
-    {
-        public int Id { get; set; }
-        public string FirstName { get; set; } = string.Empty;
-        public string LastName { get; set; } = string.Empty;
-        public DateTime DateOfBirth { get; set; }
-        public string Gender { get; set; } = string.Empty;
-        public string Address { get; set; } = string.Empty;
-        public string PhoneNumber { get; set; } = string.Empty;
     }
 }
