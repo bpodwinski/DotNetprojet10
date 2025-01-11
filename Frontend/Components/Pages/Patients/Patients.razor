@@ -50,7 +50,7 @@
     [CascadingParameter]
     private MainLayout Layout { get; set; } = default!;
 
-    private List<Patient> patients = new();
+    private List<PatientModel> patients = new();
     private bool isPatientsLoading = true;
 
     protected override async Task OnInitializedAsync()
@@ -64,10 +64,10 @@
                 if (response.IsSuccessStatusCode)
                 {
                     var responseContent = await response.Content.ReadAsStringAsync();
-                    patients = JsonSerializer.Deserialize<List<Patient>>(responseContent, new JsonSerializerOptions
+                    patients = JsonSerializer.Deserialize<List<PatientModel>>(responseContent, new JsonSerializerOptions
                         {
                             PropertyNameCaseInsensitive = true
-                        }) ?? new List<Patient>();
+                        }) ?? new List<PatientModel>();
                 }
             }
             catch (Exception ex)

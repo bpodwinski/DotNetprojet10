@@ -59,8 +59,8 @@
     [Parameter]
     public int PatientId { get; set; }
 
-    private Patient? patient = null;
-    private Notes? notesComponent = null;
+    private PatientModel? patient = null;
+    private NoteModel? notesComponent = null;
     private bool isLoading = true;
     private bool dataLoaded = false;
 
@@ -81,7 +81,7 @@
             if (response.IsSuccessStatusCode)
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
-                patient = JsonSerializer.Deserialize<Patient>(responseContent, new JsonSerializerOptions
+                patient = JsonSerializer.Deserialize<PatientModel>(responseContent, new JsonSerializerOptions
                     {
                         PropertyNameCaseInsensitive = true
                     });

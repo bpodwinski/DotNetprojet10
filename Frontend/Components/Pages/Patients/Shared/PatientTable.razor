@@ -43,7 +43,7 @@
 </table>
 
 @code {
-    [Parameter] public List<Patient> Patients { get; set; } = new();
+    [Parameter] public List<PatientModel> Patients { get; set; } = new();
     [Parameter] public EventCallback<int> OnEdit { get; set; }
     [Parameter] public EventCallback<int> OnDelete { get; set; }
     [Inject] private IStringLocalizer<Resource> Localizer { get; set; } = default!;

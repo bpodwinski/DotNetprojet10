@@ -2,6 +2,7 @@
 
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.Extensions.Localization
+@using Frontend.Models
 @using Frontend.Services
 @using Frontend.Locales
 @using System.Net.Http.Json;
@@ -68,7 +69,7 @@
 }
 
 @code {
-    private Patient newPatient = new();
+    private PatientModel newPatient = new();
     private string statusMessage = string.Empty;
     private DateTime MaxDate { get; set; } = DateTime.Today;
 
@@ -96,21 +97,5 @@
     private void GoBack()
     {
         NavigationManager.NavigateTo("/patients");
-    }
-
-    private class Patient
-    {
-        public string FirstName { get; set; } = string.Empty;
-        public string LastName { get; set; } = string.Empty;
-
-        [Required]
-        [DataType(DataType.Date)]
-        public DateTime DateOfBirth { get; set; }
-
-        public string Gender { get; set; } = string.Empty;
-        public string Address { get; set; } = string.Empty;
-
-        [RegularExpression(@"^\d{3}-\d{3}-\d{4}$|^\d{10}$", ErrorMessage = "Phone number must be in the format 111-222-3333 or 1112223333.")]
-        public string PhoneNumber { get; set; } = string.Empty;
     }
 }

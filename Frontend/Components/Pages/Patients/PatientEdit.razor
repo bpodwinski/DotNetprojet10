@@ -83,7 +83,7 @@
     [Parameter]
     public int PatientId { get; set; }
 
-    private Patient newPatient = new();
+    private PatientModel newPatient = new();
     private string statusMessage = string.Empty;
     private bool isLoading = true;
     private bool hasError = false;
@@ -105,10 +105,10 @@
             if (response.IsSuccessStatusCode)
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
-                newPatient = JsonSerializer.Deserialize<Patient>(responseContent, new JsonSerializerOptions
+                newPatient = JsonSerializer.Deserialize<PatientModel>(responseContent, new JsonSerializerOptions
                     {
                         PropertyNameCaseInsensitive = true
-                    }) ?? new Patient();
+                    }) ?? new PatientModel();
             }
             else
             {
@@ -151,21 +151,5 @@
     private void GoBack()
     {
         NavigationManager.NavigateTo("/patients");
-    }
-
-    private class Patient
-    {
-        public string FirstName { get; set; } = string.Empty;
-        public string LastName { get; set; } = string.Empty;
-
-        [Required]
-        [DataType(DataType.Date)]
-        public DateTime DateOfBirth { get; set; }
-
-        public string Gender { get; set; } = string.Empty;
-        public string Address { get; set; } = string.Empty;
-
-        [RegularExpression(@"^\d{3}-\d{3}-\d{4}$|^\d{10}$", ErrorMessage = "Phone number must be in the format 111-222-3333 or 1112223333.")]
-        public string PhoneNumber { get; set; } = string.Empty;
     }
 }

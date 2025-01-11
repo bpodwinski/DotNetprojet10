@@ -3,6 +3,7 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.Extensions.Localization
 @using System.Text.Json
+@using Frontend.Models
 @using Frontend.Services
 @using Frontend.Locales
 
@@ -46,7 +47,7 @@ else
     [Parameter]
     public int PatientId { get; set; }
 
-    private DiabeteData? report = null;
+    private DiabeteModel? report = null;
     private bool isReportLoading = true;
 
     protected override async Task OnParametersSetAsync()
@@ -62,7 +63,7 @@ else
             if (response.IsSuccessStatusCode)
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
-                report = JsonSerializer.Deserialize<DiabeteData>(responseContent, new JsonSerializerOptions
+                report = JsonSerializer.Deserialize<DiabeteModel>(responseContent, new JsonSerializerOptions
                     {
                         PropertyNameCaseInsensitive = true
                     });
@@ -92,12 +93,5 @@ else
             "Early Onset" => "alert-danger",
             _ => "alert-secondary"
         };
-    }
-
-    private class DiabeteData
-    {
-        public int PatientId { get; set; }
-        public string RiskLevel { get; set; } = string.Empty;
-        public List<string> TriggerTerms { get; set; } = new List<string>();
     }
 }

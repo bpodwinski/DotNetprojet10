@@ -3,6 +3,7 @@
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.Extensions.Localization
 @using System.Text.Json
+@using Models
 @using Frontend.Services
 @using Frontend.Locales
 
@@ -48,7 +49,7 @@ else
     [Parameter]
     public int PatientId { get; set; }
 
-    private List<NoteData>? notes = null;
+    private List<NoteModel>? notes = null;
     private bool isNotesLoading = true;
 
     protected override async Task OnParametersSetAsync()
@@ -64,7 +65,7 @@ else
             if (response.IsSuccessStatusCode)
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
-                notes = JsonSerializer.Deserialize<List<NoteData>>(responseContent, new JsonSerializerOptions
+                notes = JsonSerializer.Deserialize<List<NoteModel>>(responseContent, new JsonSerializerOptions
                     {
                         PropertyNameCaseInsensitive = true
                     });
@@ -78,22 +79,6 @@ else
         {
             isNotesLoading = false;
             StateHasChanged();
-        }
-    }
-
-    private class NoteData
-    {
-        public string Id { get; set; } = string.Empty;
-        public int PatientId { get; set; }
-        public string Note { get; set; } = string.Empty;
-        public DateTime Date { get; set; }
-        public string LocalDate
-        {
-            get
-            {
-                var timeZone = TimeZoneInfo.FindSystemTimeZoneById("Europe/Paris");
-                return TimeZoneInfo.ConvertTimeFromUtc(Date, timeZone).ToString("yyyy-MM-dd HH:mm:ss");
-            }
         }
     }
 }
