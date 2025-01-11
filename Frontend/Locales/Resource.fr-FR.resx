@@ -141,6 +141,12 @@
   <data name="CausedBy" xml:space="preserve">
     <value>Causé par</value>
   </data>
+  <data name="CreateFirstPatient" xml:space="preserve">
+    <value>Créer votre premier patient</value>
+  </data>
+  <data name="Delete" xml:space="preserve">
+    <value>Supprimer</value>
+  </data>
   <data name="Diabete" xml:space="preserve">
     <value>Diabète</value>
   </data>
@@ -162,6 +168,12 @@
   <data name="Logout" xml:space="preserve">
     <value>Se déconnecter</value>
   </data>
+  <data name="NoPatientsFound" xml:space="preserve">
+    <value>Aucun patient trouvé</value>
+  </data>
+  <data name="NoPatientsFoundDesc" xml:space="preserve">
+    <value>Aucun patient n'est actuellement disponible. Ajoutez votre premier patient maintenant !</value>
+  </data>
   <data name="NoteAddedError" xml:space="preserve">
     <value>Ajout de la note a échoué</value>
   </data>
@@ -179,6 +191,12 @@
   </data>
   <data name="Password" xml:space="preserve">
     <value>Mot de passe</value>
+  </data>
+  <data name="PatientDeletedSuccessDesc" xml:space="preserve">
+    <value>Le patient a été supprimé avec succès</value>
+  </data>
+  <data name="PatientDeletedSuccessTitle" xml:space="preserve">
+    <value>Patient supprimé avec succès</value>
   </data>
   <data name="PatientInfos" xml:space="preserve">
     <value>Information du patient</value>

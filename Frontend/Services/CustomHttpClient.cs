@@ -44,6 +44,41 @@ namespace Frontend.Services
             }
         }
 
+        public async Task<HttpResponseMessage> PutAsync<T>(string requestUri, T content)
+        {
+            try
+            {
+                await AddAuthorizationHeader();
+                _logger.LogInformation("Sending PUT request to {RequestUri} with content of type {ContentType}", requestUri, typeof(T).Name);
+                var response = await _httpClient.PutAsJsonAsync(requestUri, content);
+                _logger.LogInformation("Received response for PUT request to {RequestUri}: {StatusCode}", requestUri, response.StatusCode);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while sending PUT request to {RequestUri}", requestUri);
+                throw;
+            }
+        }
+
+        public async Task<HttpResponseMessage> DeleteAsync(string requestUri)
+        {
+            try
+            {
+                await AddAuthorizationHeader();
+                _logger.LogInformation("Sending DELETE request to {RequestUri}", requestUri);
+                var response = await _httpClient.DeleteAsync(requestUri);
+                _logger.LogInformation("Received response for DELETE request to {RequestUri}: {StatusCode}", requestUri, response.StatusCode);
+                return response;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while sending DELETE request to {RequestUri}", requestUri);
+                throw;
+            }
+        }
+
+
         private async Task AddAuthorizationHeader()
         {
             try

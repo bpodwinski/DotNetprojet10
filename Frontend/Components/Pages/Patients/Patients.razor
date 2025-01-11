@@ -1,0 +1,116 @@
+﻿@page "/patients"
+
+@using Microsoft.AspNetCore.Authorization
+@using Microsoft.Extensions.Localization
+@using System.Globalization
+@using Frontend.Locales
+@using Frontend.Services
+@using Frontend.Models
+@using System.Text.Json
+@using Layout
+@using Frontend.Components.Pages.Patients.Shared
+
+@inject CustomHttpClient CustomHttpClient
+@inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IStringLocalizer<Resource> Localizer
+@inject NavigationManager NavigationManager
+
+<PageTitle>@Localizer["Patients"]</PageTitle>
+
+<div class="d-flex align-items-center">
+    <h1 class="me-2">@Localizer["Patients"]</h1>
+    <button class="btn btn-primary" @onclick="Create">@Localizer["Add"]</button>
+</div>
+
+<AuthorizeView>
+    <Authorized>
+        @if (isPatientsLoading)
+        {
+            <Loading />
+        }
+        else if (patients.Any())
+        {
+            <PatientTable Patients="patients" OnDelete="Delete" />
+        }
+        else
+        {
+            <div class="d-flex justify-content-center align-items-center flex-column" style="height: 50vh;">
+                <div class="alert alert-info text-center" role="alert">
+                    <h4 class="alert-heading">@Localizer["NoPatientsFound"]</h4>
+                    <p>@Localizer["NoPatientsFoundDesc"]</p>
+                    <hr>
+                    <button class="btn btn-primary" @onclick="Create">
+                        @Localizer["CreateFirstPatient"]
+                    </button>
+                </div>
+            </div>
+        }
+    </Authorized>
+    <NotAuthorized>
+        <p>You are not authorized to access this page. Please log in.</p>
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+    [CascadingParameter]
+    private MainLayout Layout { get; set; } = default!;
+
+    private List<Patient> patients = new();
+    private bool isPatientsLoading = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
+        if (authState.User.Identity?.IsAuthenticated ?? false)
+        {
+            try
+            {
+                var response = await CustomHttpClient.GetAsync("patients");
+                if (response.IsSuccessStatusCode)
+                {
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    patients = JsonSerializer.Deserialize<List<Patient>>(responseContent, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    }) ?? new List<Patient>();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading patients: {ex.Message}");
+            }
+            finally
+            {
+                isPatientsLoading = false;
+                StateHasChanged();
+            }
+        }
+    }
+
+    private async Task Delete(int id)
+    {
+        try
+        {
+            var response = await CustomHttpClient.DeleteAsync($"patients/{id}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                patients = patients.Where(p => p.Id != id).ToList();
+                Layout.ShowToast(Localizer["PatientDeletedSuccessTitle"], Localizer["PatientDeletedSuccessDesc"]);
+            }
+            else
+            {
+                Layout.ShowToast(Localizer["PatientDeletedFailedTitle"], Localizer["PatientDeletedFailedDesc"]);
+            }
+        }
+        catch (Exception ex)
+        {
+            Layout.ShowToast(Localizer["PatientDeletedError"], ex.Message);
+        }
+    }
+
+    private void Create()
+    {
+        NavigationManager.NavigateTo("/patients/add");
+    }
+}

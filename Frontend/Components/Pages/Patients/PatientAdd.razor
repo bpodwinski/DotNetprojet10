@@ -1,4 +1,4 @@
-﻿@page "/patient/add"
+﻿@page "/patients/add"
 
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.Extensions.Localization
@@ -54,7 +54,7 @@
                 </div>
 
                 <button type="button" class="btn btn-secondary" @onclick="GoBack">@Localizer["Cancel"]</button>
-                <button type="submit" class="btn btn-primary">@Localizer["AddPatient"]</button>
+                <button type="submit" class="btn btn-primary">@Localizer["Add"]</button>
             </EditForm>
         </div>
     </div>
@@ -90,7 +90,6 @@
             statusMessage = $"{Localizer["ErrorAddingPatient"]}: {ex.Message}";
         }
     }
-
 
     private void GoBack()
     {

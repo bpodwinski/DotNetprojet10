@@ -1,0 +1,46 @@
+﻿@using Frontend.Models
+@using Microsoft.Extensions.Localization
+@using System.Globalization
+@using Frontend.Locales
+
+<table class="table">
+    <thead>
+        <tr>
+            <th>@Localizer["ID"]</th>
+            <th>@Localizer["FirstName"]</th>
+            <th>@Localizer["LastName"]</th>
+            <th>@Localizer["BirthDate"]</th>
+            <th>@Localizer["Gender"]</th>
+            <th>@Localizer["Address"]</th>
+            <th>@Localizer["Phone"]</th>
+            <th>@Localizer["Actions"]</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var patient in Patients)
+        {
+            <tr>
+                <td>@patient.Id</td>
+                <td>@patient.FirstName</td>
+                <td>
+                    <a href="/patients/@patient.Id">@patient.LastName</a>
+                </td>
+                <td>@patient.DateOfBirth.ToShortDateString()</td>
+                <td>@patient.Gender</td>
+                <td>@patient.Address</td>
+                <td>@patient.PhoneNumber</td>
+                <td>
+                    <button @onclick="(() => OnDelete.InvokeAsync(patient.Id))" class="btn btn-danger" data-bs-toggle="tooltip" data-bs-title="@Localizer[" Delete"]">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@code {
+    [Parameter] public List<Patient> Patients { get; set; } = new();
+    [Parameter] public EventCallback<int> OnDelete { get; set; }
+    [Inject] private IStringLocalizer<Resource> Localizer { get; set; } = default!;
+}
