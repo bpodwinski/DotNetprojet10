@@ -37,6 +37,7 @@
                         <InputDate @bind-Value="newPatient.DateOfBirth" class="form-control"
                                    min="1900-01-01" max="@MaxDate.ToString("yyyy-MM-dd")" />
                         <ValidationMessage For="() => newPatient.DateOfBirth" />
+
                     </div>
                     <div class="mb-3">
                         <label class="form-label">@Localizer["Gender"]</label>
@@ -69,9 +70,13 @@
 }
 
 @code {
-    private PatientModel newPatient = new();
+    private PatientModel newPatient = new PatientModel
+        {
+            DateOfBirth = DateTime.Today
+        };
     private string statusMessage = string.Empty;
     private DateTime MaxDate { get; set; } = DateTime.Today;
+
 
     private async Task HandleValidSubmit()
     {
