@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -8,7 +9,6 @@ using ReportService.Services;
 using Serilog;
 using System.Reflection;
 using System.Text;
-
 var builder = WebApplication.CreateBuilder(args);
 
 // Load configuration files
@@ -136,16 +136,28 @@ builder.Services.AddScoped<IPatientRepository, PatientRepository>();
 builder.Services.AddScoped<INoteRepository, NoteRepository>();
 builder.Services.AddScoped<IReportService, ReportService.Services.ReportService>();
 
-// Register ML.NET Trigger Analyzer as a singleton
-builder.Services.AddSingleton<ML>(sp =>
+// Configure DI for IModelTrainer
+builder.Services.AddScoped<IModelTrainer>(sp =>
 {
-    var logger = sp.GetRequiredService<ILogger<ML>>();
-    string modelPath = "Models/TriggerModel.zip";
-    return new ML(modelPath, logger);
+    var configuration = sp.GetRequiredService<IConfiguration>();
+    var logger = sp.GetRequiredService<ILogger<ModelTrainer>>();
+    return new ModelTrainer(configuration, logger);
 });
 
-// Register ModelInitializer
-builder.Services.AddSingleton<ModelInitializer>();
+// Configure DI for IMachineLearningService
+builder.Services.AddScoped<IMachineLearningService>(sp =>
+{
+    var configuration = sp.GetRequiredService<IConfiguration>();
+    var logger = sp.GetRequiredService<ILogger<MachineLearningService>>();
+    var modelTrainer = sp.GetRequiredService<IModelTrainer>();
+    return new MachineLearningService(modelTrainer, configuration, logger);
+});
+
+builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
+
+// Modifier l'enregistrement de ModelInitializer
+builder.Services.AddScoped<ModelInitializer>();
+
 
 builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();

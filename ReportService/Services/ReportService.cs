@@ -8,22 +8,15 @@ namespace ReportService.Services
     /// </summary>
     public class ReportService : IReportService
     {
+        private readonly IMachineLearningService _machineLearningService;
         private IPatientRepository _patientRepository;
         private INoteRepository _noteRepository;
-        private readonly ML _triggerAnalyzer;
 
-        private readonly List<string> _triggerTerms = new List<string>
-        {
-            "Hémoglobine A1C", "Microalbumine", "Taille", "Poids",
-            "Fumeur", "Fumeuse", "Anormal", "Cholestérol",
-            "Vertiges", "Rechute", "Réaction", "Anticorps"
-        };
-
-        public ReportService(IPatientRepository patientRepository,INoteRepository noteRepository, ML triggerAnalyzer)
+        public ReportService(IPatientRepository patientRepository,INoteRepository noteRepository, IMachineLearningService machineLearningService)
         {
             _patientRepository = patientRepository;
             _noteRepository = noteRepository;
-            _triggerAnalyzer = triggerAnalyzer;
+            _machineLearningService = machineLearningService ?? throw new ArgumentNullException(nameof(machineLearningService));
         }
 
         /// <summary>
@@ -63,7 +56,7 @@ namespace ReportService.Services
                     if (!string.IsNullOrWhiteSpace(note.Note))
                     {
                         // Utiliser TriggerAnalyzer pour détecter les déclencheurs dans la note
-                        var detectedTriggers = ML.IdentifierDeclencheurs(new ModelInput { Notes = note.Note });
+                        var detectedTriggers = _machineLearningService.IdentifyTriggers(new Models.MachineLearningInputModel { Notes = note.Note });
                         foreach (var trigger in detectedTriggers)
                         {
                             foundTriggers.Add(trigger);
