@@ -1,14 +1,13 @@
 ﻿@page "/patients/{PatientId:int}"
 
+@using System.Text.Json
 @using Frontend.Models
-@using Frontend.Components.Partials
-@using Frontend.Components.Partials.Diabete
+@using Frontend.Components.Shared.Diabete
+@using Frontend.Components.Shared.Note
 @using Microsoft.AspNetCore.Authorization
 @using Microsoft.Extensions.Localization
-@using System.Text.Json
 @using Frontend.Services
 @using Frontend.Locales
-@using Frontend.Components.Partials.Notes
 
 @inject CustomHttpClient CustomHttpClient
 @inject IStringLocalizer<Resource> Localizer
@@ -27,6 +26,7 @@
             <div class="card mb-4">
                 <div class="card-body">
                     <p class="card-text text-center"><strong>@Localizer["BirthDate"]:</strong> @patient.DateOfBirth.ToShortDateString()</p>
+                    <p class="card-text text-center"><strong>@Localizer["Age"]:</strong> @CalculateAge(patient.DateOfBirth) @Localizer["years"]</p>
                     <p class="card-text text-center"><strong>@Localizer["Gender"]:</strong> @patient.Gender</p>
                     <p class="card-text text-center"><strong>@Localizer["Address"]:</strong> @patient.Address</p>
                     <p class="card-text text-center"><strong>@Localizer["Phone"]:</strong> @patient.PhoneNumber</p>
@@ -60,7 +60,7 @@
     public int PatientId { get; set; }
 
     private PatientModel? patient = null;
-    private NoteModel? notesComponent = null;
+    private Notes? notesComponent = null;
     private bool isLoading = true;
     private bool dataLoaded = false;
 
@@ -101,6 +101,14 @@
         {
             isLoading = false;
         }
+    }
+
+    private int CalculateAge(DateTime birthDate)
+    {
+        var today = DateTime.Today;
+        var age = today.Year - birthDate.Year;
+        if (birthDate > today.AddYears(-age)) age--;
+        return age;
     }
 
     private async Task RefreshNotes()

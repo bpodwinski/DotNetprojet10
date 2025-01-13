@@ -1,10 +1,10 @@
-﻿@using Frontend.Components.Partials
+﻿@using Frontend.Components
 
 <Router AppAssembly="typeof(Program).Assembly">
     <Found Context="routeData">
         <AuthorizeRouteView RouteData="routeData" DefaultLayout="typeof(Layout.MainLayout)">
             <NotAuthorized>
-                <NotAuthorizedHandler />
+                <p>You are not authorized to access this page. Please <a href="/login">log in</a>.</p>
             </NotAuthorized>
         </AuthorizeRouteView>
         <FocusOnNavigate RouteData="routeData" Selector="h1" />

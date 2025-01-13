@@ -129,6 +129,9 @@
   <data name="Address" xml:space="preserve">
     <value>Adresse</value>
   </data>
+  <data name="Age" xml:space="preserve">
+    <value>Age</value>
+  </data>
   <data name="Back" xml:space="preserve">
     <value>Retour</value>
   </data>
@@ -171,6 +174,9 @@
   <data name="Logout" xml:space="preserve">
     <value>Se déconnecter</value>
   </data>
+  <data name="NoNotesFound" xml:space="preserve">
+    <value>Aucune notes trouvées</value>
+  </data>
   <data name="NoPatientsFound" xml:space="preserve">
     <value>Aucun patient trouvé</value>
   </data>
@@ -212,5 +218,8 @@
   </data>
   <data name="Username" xml:space="preserve">
     <value>Nom d'utilisateur</value>
+  </data>
+  <data name="years" xml:space="preserve">
+    <value>ans</value>
   </data>
 </root>
