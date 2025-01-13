@@ -53,6 +53,10 @@
             if (response.IsSuccessStatusCode)
             {
                 Layout.ShowToast(Localizer["NoteAddedSuccess"], "The note has been successfully added");
+                if (OnNoteAdded.HasDelegate)
+                {
+                    await OnNoteAdded.InvokeAsync();
+                }
             }
             else
             {
