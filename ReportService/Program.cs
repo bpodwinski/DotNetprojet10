@@ -2,6 +2,7 @@
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using ReportService;
 using ReportService.Repositories;
 using ReportService.Services;
 using Serilog;
@@ -17,6 +18,12 @@ var environment = builder.Environment.EnvironmentName;
 builder.Configuration
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .AddJsonFile($"appsettings{environment}.json", optional: true);
+
+//  Load .env file if environment is not Docker
+if (!string.Equals(environment, "Docker", StringComparison.OrdinalIgnoreCase))
+{
+    DotNetEnv.Env.Load();
+}
 
 // Configure Serilog for logging
 Log.Logger = new LoggerConfiguration()
@@ -129,6 +136,17 @@ builder.Services.AddScoped<IPatientRepository, PatientRepository>();
 builder.Services.AddScoped<INoteRepository, NoteRepository>();
 builder.Services.AddScoped<IReportService, ReportService.Services.ReportService>();
 
+// Register ML.NET Trigger Analyzer as a singleton
+builder.Services.AddSingleton<ML>(sp =>
+{
+    var logger = sp.GetRequiredService<ILogger<ML>>();
+    string modelPath = "Models/TriggerModel.zip";
+    return new ML(modelPath, logger);
+});
+
+// Register ModelInitializer
+builder.Services.AddSingleton<ModelInitializer>();
+
 builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();
 
@@ -136,6 +154,13 @@ var app = builder.Build();
 
 // Apply Serilog request logging
 app.UseSerilogRequestLogging();
+
+// Initialize ML.NET model
+using (var scope = app.Services.CreateScope())
+{
+    var modelInitializer = scope.ServiceProvider.GetRequiredService<ModelInitializer>();
+    modelInitializer.Initialize();
+}
 
 // Apply middleware
 if (app.Environment.IsDevelopment())

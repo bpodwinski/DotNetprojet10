@@ -10,11 +10,20 @@ namespace ReportService.Services
     {
         private IPatientRepository _patientRepository;
         private INoteRepository _noteRepository;
+        private readonly ML _triggerAnalyzer;
 
-        public ReportService(IPatientRepository patientRepository, INoteRepository noteRepository)
+        private readonly List<string> _triggerTerms = new List<string>
+        {
+            "Hémoglobine A1C", "Microalbumine", "Taille", "Poids",
+            "Fumeur", "Fumeuse", "Anormal", "Cholestérol",
+            "Vertiges", "Rechute", "Réaction", "Anticorps"
+        };
+
+        public ReportService(IPatientRepository patientRepository,INoteRepository noteRepository, ML triggerAnalyzer)
         {
             _patientRepository = patientRepository;
             _noteRepository = noteRepository;
+            _triggerAnalyzer = triggerAnalyzer;
         }
 
         /// <summary>
@@ -41,24 +50,26 @@ namespace ReportService.Services
                     {
                         PatientId = id,
                         RiskLevel = "None",
-                        TriggerTerms = []
+                        TriggerTerms = new List<string>()
                     };
                 }
 
-                // Liste des termes déclencheurs
-                var triggerTerms = new List<string>
-                {
-                    "Hémoglobine A1C", "Microalbumine", "Taille", "Poids",
-                    "Fumeur", "Fumeuse", "Anormal", "Cholestérol",
-                    "Vertiges", "Rechute", "Réaction", "Anticorps"
-                };
+                // Initialiser une liste pour collecter les déclencheurs détectés
+                var foundTriggers = new HashSet<string>();
 
-                // Recherche des termes déclencheurs dans les notes médicales
-                var foundTriggers = notes
-                    .SelectMany(note => triggerTerms.Where(term =>
-                        note.Note.Contains(term, StringComparison.OrdinalIgnoreCase)))
-                    .Distinct()
-                    .ToList();
+                // Parcourir chaque note pour détecter les déclencheurs
+                foreach (var note in notes)
+                {
+                    if (!string.IsNullOrWhiteSpace(note.Note))
+                    {
+                        // Utiliser TriggerAnalyzer pour détecter les déclencheurs dans la note
+                        var detectedTriggers = ML.IdentifierDeclencheurs(new ModelInput { Notes = note.Note });
+                        foreach (var trigger in detectedTriggers)
+                        {
+                            foundTriggers.Add(trigger);
+                        }
+                    }
+                }
 
                 // Compter les déclencheurs
                 int triggerCount = foundTriggers.Count;
@@ -71,7 +82,7 @@ namespace ReportService.Services
                 {
                     PatientId = id,
                     RiskLevel = riskLevel,
-                    TriggerTerms = foundTriggers
+                    TriggerTerms = foundTriggers.ToList() // Liste des notes considérées comme des déclencheurs
                 };
             }
             catch (Exception ex)

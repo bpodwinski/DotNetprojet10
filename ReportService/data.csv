@@ -1,0 +1,190 @@
+﻿Age;Sexe;Hemoglobine_A1C;Microalbumine;Taille;Poids;Fumeur;Anormal;Cholesterol;Vertiges;Rechute;Reaction;Anticorps;Notes;Niveau_de_risque;Label
+25;Homme;1;0;0;1;1;0;1;0;0;0;0;Le patient présente une hémoglobine A1C élevée et est fumeur.;In Danger;1
+32;Femme;0;1;0;0;0;0;1;1;0;0;0;La patiente présente un taux de cholestérol anormal.;Borderline;1
+45;Homme;0;0;0;0;0;1;1;0;0;0;0;Le patient présente une anomalie et un taux élevé de cholestérol.;Borderline;1
+28;Femme;1;1;1;1;1;0;1;0;0;1;0;La patiente présente plusieurs déclencheurs, y compris une hémoglobine élevée.;Early onset;1
+50;Homme;0;0;0;0;0;0;0;0;0;0;0;Le patient ne présente aucun déclencheur.;None;0
+19;Femme;1;1;1;1;1;1;1;0;1;0;1;La patiente présente des symptômes graves, y compris une réaction et des anticorps.;Early onset;1
+34;Homme;0;0;0;0;1;0;0;0;0;0;0;Le patient est fumeur, mais ne présente pas d'autres déclencheurs significatifs.;Borderline;1
+42;Femme;0;0;0;0;0;0;0;0;0;0;0;La patiente ne présente aucun symptôme de risque de diabète.;None;0
+30;Homme;1;1;0;1;0;1;1;1;1;0;0;Le patient présente plusieurs déclencheurs, y compris des vertiges.;In Danger;1
+29;Femme;1;1;1;1;1;0;0;0;0;0;0;La patiente présente plusieurs symptômes modérés.;Early onset;1
+60;Homme;0;0;0;0;0;0;0;0;0;0;0;Le patient ne présente aucun déclencheur ou symptôme de risque.;None;0
+40;Femme;0;0;0;0;0;0;1;0;0;0;0;La patiente présente un taux de cholestérol légèrement élevé.;Borderline;1
+20;Homme;1;0;1;1;1;1;1;1;0;0;1;Le patient présente des symptômes graves, y compris une hémoglobine élevée et des anticorps.;Early onset;1
+36;Femme;1;1;0;0;0;0;0;0;0;0;0;La patiente présente une hémoglobine élevée et une microalbumine détectée.;Borderline;1
+23;Homme;0;0;1;1;1;1;0;0;0;0;0;Le patient présente une anomalie, un poids élevé et est fumeur.;In Danger;1
+25;Homme;1;1;1;1;1;1;1;1;1;1;1;Le patient présente tous les déclencheurs possibles.;Early onset;1
+30;Femme;1;0;0;1;1;1;1;0;0;1;0;La patiente présente des déclencheurs modérés, y compris le poids et le cholestérol.;In Danger;1
+45;Homme;0;1;0;0;0;0;1;1;1;0;0;Le patient présente un taux de cholestérol élevé avec des vertiges et une rechute.;Borderline;1
+50;Femme;0;0;0;0;0;0;0;0;0;0;0;La patiente ne présente aucun déclencheur.;None;0
+28;Homme;1;1;1;1;1;1;0;0;0;0;0;Le patient présente des déclencheurs multiples, mais pas de rechute ou d'anticorps.;Early onset;1
+32;Femme;0;1;0;0;0;0;0;0;0;1;1;La patiente présente une microalbumine détectée avec une réaction et des anticorps.;Borderline;1
+19;Homme;1;1;1;1;1;1;1;1;1;1;1;Le patient présente tous les symptômes graves possibles.;Early onset;1
+34;Femme;0;0;0;0;0;0;1;1;0;0;0;La patiente présente un taux de cholestérol anormal et des vertiges.;Borderline;1
+42;Homme;0;0;1;0;1;1;0;0;0;0;0;Le patient présente une anomalie, fume et a une taille anormale.;In Danger;1
+60;Homme;0;0;0;0;0;0;0;0;0;0;0;Le patient ne présente aucun déclencheur ou symptôme de risque.;None;0
+36;Femme;0;1;0;0;0;0;1;0;0;0;0;La patiente présente un taux de cholestérol légèrement élevé et une microalbumine détectée.;Borderline;1
+20;Homme;1;1;1;1;1;1;1;1;1;1;1;Le patient présente tous les symptômes graves, y compris une hémoglobine élevée et des anticorps.;Early onset;1
+23;Homme;0;0;1;1;1;1;0;0;0;0;0;Le patient présente une anomalie, un poids élevé et est fumeur.;In Danger;1
+33;Femme;1;1;0;0;0;1;1;1;0;0;0;La patiente présente plusieurs déclencheurs modérés, y compris le cholestérol et les vertiges.;Borderline;1
+25;Homme;1;0;0;1;1;0;1;0;0;0;0;Le patient a une Hémogoblne élevée et est un fumeurr.;In Danger;1
+32;Femme;0;1;0;0;0;0;1;1;0;0;0;Cholestérol légèrement élevé détecté, sans autres symptômes graves.;Borderline;1
+45;Homme;0;0;0;0;0;1;1;0;0;0;0;Un taux de lipides élevé a été noté, anomalie non précisée.;Borderline;1
+28;Femme;1;1;1;1;1;0;1;0;0;1;0;Des déclencheurs multiples : HbA1c élevée, poids anormal.;Early onset;1
+50;Homme;0;0;0;0;0;0;0;0;0;0;0;Pas de signes évidents de risque diabétique.;None;0
+19;Femme;1;1;1;1;1;1;1;0;1;0;1;Grave : Présence d’anticorps, rechute, et taux élevés.;Early onset;1
+34;Homme;0;0;0;0;1;0;0;0;0;0;0;Seule la fumée est un facteur notable ici.;Borderline;1
+42;Femme;0;0;0;0;0;0;0;0;0;0;0;Aucun symptôme apparent ou signalé.;None;0
+30;Homme;1;1;0;1;0;1;1;1;1;0;0;Présente des vertiges fréquents et des anomalies détectées.;In Danger;1
+29;Femme;1;1;1;1;1;0;0;0;0;0;0;Notes ambiguës : HbA1c et microalb. élevées.;Early onset;1
+60;Homme;0;0;0;0;0;0;0;0;0;0;0;Patient sans aucun déclencheur détectable.;None;0
+20;Homme;1;0;1;1;1;1;1;1;0;0;1;Symptômes alarmants : HbA1c, anticorps et anomalies.;Early onset;1
+36;Femme;1;1;0;0;0;0;0;0;0;0;0;Hyperglycémie détectée et microalbumine élevée.;Borderline;1
+23;Homme;0;0;1;1;1;1;0;0;0;0;0;Poids élevé, anomalie légère, fume : pas d'autres symptômes.;In Danger;1
+25;Homme;1;1;1;1;1;1;1;1;1;1;1;Tous les déclencheurs signalés : critique !;Early onset;1
+30;Femme;1;0;0;1;1;1;1;0;0;1;0;Symptômes variés : poids, cholestérol et réaction signalée.;In Danger;1
+45;Homme;0;1;0;0;0;0;1;1;1;0;0;Légers vertiges et cholestérol hors normes.;Borderline;1
+50;Femme;0;0;0;0;0;0;0;0;0;0;0;Absence totale de symptômes liés au diabète.;None;0
+32;Femme;0;1;0;0;0;0;0;0;0;1;1;Présence de microalbumine et signes immunitaires légers.;Borderline;1
+19;Homme;1;1;1;1;1;1;1;1;1;1;1;Danger critique : HbA1c, anticorps et symptômes multiples.;Early onset;1
+34;Femme;0;0;0;0;0;0;1;1;0;0;0;Cholestérol haut et vertiges notés.;Borderline;1
+29;Femme;1;1;0;1;1;0;0;0;0;0;0;HbA1c élevé avec un poids à surveiller.;Early onset;1
+60;Homme;0;0;0;0;0;0;0;0;0;0;0;Aucun déclencheur n'a été identifié pour ce patient.;None;0
+36;Femme;0;1;0;0;0;0;1;0;0;0;0;Microalbumine légère et cholestérol légèrement élevé.;Borderline;1
+20;Homme;1;1;1;1;1;1;1;1;1;1;1;Tous les signes d’alerte graves présents : danger critique.;Early onset;1
+23;Homme;0;0;1;1;1;1;0;0;0;0;0;Poids et anomalies notables, mais sans rechute ou réaction.;In Danger;1
+33;Femme;1;1;0;0;0;1;1;1;0;0;0;Symptômes modérés avec quelques anomalies et cholestérol.;Borderline;1
+25;Homme;1;0;0;1;1;0;1;0;0;0;0;Le patient a une Hémoglobine A1C élevée, mais n'est plus fumeur.;In Danger;1
+32;Femme;0;1;0;0;0;0;1;1;0;0;0;La patiente présente un cholestérol légèrement élevé, mais aucun autre facteur important.;Borderline;1
+45;Homme;0;0;0;0;0;1;1;0;0;0;0;Anomalie signalée : aucun signe de rechute ou de vertiges.;Borderline;1
+28;Femme;1;1;1;1;1;0;1;0;0;1;0;Présence d’HbA1c élevée et d'autres anomalies, mais pas de réaction notable.;Early onset;1
+50;Homme;0;0;0;0;0;0;0;0;0;0;0;Le patient n'a aucun facteur de risque ou symptôme apparent.;None;0
+19;Femme;1;1;1;1;1;1;1;0;1;0;1;Tous les symptômes sont graves, sauf qu’aucun vertige n’est présent.;Early onset;1
+34;Homme;0;0;0;0;1;0;0;0;0;0;0;Fumeur occasionnel, mais sans anomalies significatives détectées.;Borderline;1
+42;Femme;0;0;0;0;0;0;0;0;0;0;0;La patiente ne montre aucun signe ou déclencheur lié au diabète.;None;0
+30;Homme;1;1;0;1;0;1;1;1;1;0;0;Vertiges, anomalies, mais aucun signe de rechute.;In Danger;1
+40;Femme;0;0;0;0;0;0;1;0;0;0;0;Léger cholestérol, sans anomalies significatives.;Borderline;1
+36;Femme;1;1;0;0;0;0;0;0;0;0;0;Hyperglycémie notée, mais pas de signe d’anticorps.;Borderline;1
+23;Homme;0;0;1;1;1;1;0;0;0;0;0;Le patient présente une anomalie légère et un poids élevé, mais ne fume pas.;In Danger;1
+25;Homme;1;1;1;1;1;1;1;1;1;1;1;Tous les déclencheurs possibles sauf microalbumine détectée.;Early onset;1
+30;Femme;1;0;0;1;1;1;1;0;0;1;0;Poids anormal et réaction signalée, mais aucun signe d’anticorps.;In Danger;1
+45;Homme;0;1;0;0;0;0;1;1;1;0;0;Léger cholestérol et vertiges, mais aucun facteur critique.;Borderline;1
+50;Femme;0;0;0;0;0;0;0;0;0;0;0;Patient sans symptômes détectés.;None;0
+28;Homme;1;1;1;1;1;1;0;0;0;0;0;Anomalies détectées, mais sans rechute ni réaction signalée.;Early onset;1
+32;Femme;0;1;0;0;0;0;0;0;0;1;1;Présence de microalbumine, mais anticorps non confirmés.;Borderline;1
+19;Homme;1;1;1;1;1;1;1;1;1;1;1;Tous les déclencheurs sont présents, sauf rechute signalée.;Early onset;1
+34;Femme;0;0;0;0;0;0;1;1;0;0;0;Taux de cholestérol légèrement haut, sans vertiges associés.;Borderline;1
+42;Homme;0;0;1;0;1;1;0;0;0;0;0;Poids légèrement au-dessus de la moyenne, aucune autre anomalie critique.;In Danger;1
+60;Homme;0;0;0;0;0;0;0;0;0;0;0;Aucun facteur déclencheur pour ce patient.;None;0
+20;Homme;1;1;1;1;1;1;1;1;1;1;1;Symptômes critiques : HbA1c élevée, anticorps présents, mais aucun vertige rapporté.;Early onset;1
+23;Homme;0;0;1;1;1;1;0;0;0;0;0;Anomalie mineure et poids légèrement élevé, aucun vertige noté.;In Danger;1
+33;Femme;1;1;0;0;0;1;1;1;0;0;0;Symptômes modérés détectés avec anomalies et cholestérol, mais pas d’autres facteurs critiques.;Borderline;1
+30;Homme;1;0;0;0;0;0;0;1;0;0;0;Pas de cholestérol détecté, mais présence de vertiges et d'hémoglobine élevée.;In Danger;1
+40;Femme;0;1;0;0;0;0;0;1;0;0;0;Le patient n’a pas de rechute mais souffre de vertiges constants.;Borderline;1
+29;Femme;0;1;0;0;0;0;0;0;0;0;0;Pas de symptômes de réaction ou d'anticorps, mais microalbumine détectée.;Early onset;1
+45;Homme;1;0;0;0;0;1;0;0;0;0;0;Pas de surpoids, mais des lipides anormaux et une glycémie élevée.;Borderline;1
+35;Homme;0;0;0;0;0;0;1;1;0;0;0;Pas de rechute signalée, mais des réactions allergiques suspectées.;Borderline;1
+22;Femme;0;1;0;0;0;0;0;0;0;0;1;Il n’y a aucun signe d’hypercholestérolémie, mais possible présence d'anticorps.;In Danger;1
+28;Homme;0;0;0;0;1;1;0;0;0;0;0;Jamais de vertiges ou d’étourdissements signalés, mais anomalie détectée.;In Danger;1
+50;Femme;0;0;0;0;0;0;0;0;0;0;0;Les symptômes évoquent une réaction inflammatoire, mais aucune microalbumine n'a été détectée.;None;0
+37;Homme;0;1;0;0;0;0;1;0;0;0;0;Présence de glycémie élevée et de protéinurie.;Borderline;1
+60;Femme;0;0;0;0;0;0;0;0;0;0;0;Aucun étourdissement ou anomalie, mais un poids élevé.;None;0
+40;Homme;0;0;0;0;0;0;0;0;0;0;0;Le patient ne souffre pas d'une hémoglobine élevée ni de rechute.;None;0
+30;Femme;1;0;0;0;0;0;0;1;0;0;0;La patiente présente des vertiges, mais aucune trace de cholestérol anormal.;Borderline;1
+25;Homme;1;0;0;1;1;0;1;0;0;0;0;Hémoglobine élevée détectée, mais le patient ne présente aucun autre déclencheur.;In Danger;1
+45;Femme;0;1;0;0;0;0;0;0;0;0;0;Microalbumine détectée, mais aucune indication d'anticorps ou de vertiges.;Borderline;1
+35;Homme;1;1;0;0;0;1;1;0;0;0;0;Le patient a une hémoglobine élevée et un cholestérol anormal, mais aucune rechute.;Borderline;1
+50;Femme;0;0;0;0;0;0;0;0;0;0;0;La patiente n'a aucun symptôme de rechute ou de microalbumine.;None;0
+28;Homme;1;1;0;0;0;0;0;0;0;0;0;Microalbumine détectée, mais le patient ne signale pas de problème lié à l'hémoglobine.;Borderline;1
+33;Femme;0;0;0;0;0;0;1;0;0;0;0;Cholestérol légèrement élevé, mais ne montre pas de symptômes liés à la rechute.;Borderline;1
+20;Homme;1;0;0;0;0;1;1;1;0;0;0;Hémoglobine élevée, mais exclu tout problème lié à la taille ou à la rechute.;In Danger;1
+29;Femme;1;0;1;1;1;0;0;0;0;0;0;La patiente est fumeuse, mais aucune anomalie n'a été trouvée.;Early onset;1
+45;Homme;0;0;0;0;0;0;0;0;0;0;0;Le patient ne démontre pas de symptômes liés au diabète.;None;0
+37;Femme;1;0;0;0;0;0;1;1;0;0;0;Cholestérol élevé et vertiges détectés, mais aucune indication de réaction.;Borderline;1
+50;Homme;0;0;0;0;0;0;0;0;0;0;0;Aucun élément dans le dossier ne montre des déclencheurs significatifs.;None;0
+25;Femme;1;1;1;1;1;1;1;0;0;0;0;Plusieurs déclencheurs détectés, mais pas de trace d'anticorps ni de rechute.;Early onset;1
+34;Homme;0;0;0;0;0;0;1;0;0;0;0;Le patient ne figure pas parmi les cas avec hémoglobine ou microalbumine.;Borderline;1
+42;Femme;0;1;0;0;0;0;0;0;0;0;0;Microalbumine détectée, mais aucun symptôme de fumeur ou d'anomalie.;Borderline;1
+35;Homme;1;0;0;0;0;0;0;0;0;0;0;Le patient présente un taux d'hémoglobine élevé mais aucune protéinurie.;In Danger;1
+40;Femme;0;1;0;0;0;0;0;1;0;0;0;La patiente a des étourdissements et une albumine détectée.;Borderline;1
+28;Homme;0;0;1;1;1;0;0;0;0;0;0;Le patient est en surpoids, mais aucun signe d'hypercholestérolémie.;Early onset;1
+50;Femme;0;0;0;0;0;0;1;0;0;0;0;Le dossier indique un taux de cholestérol légèrement élevé.;Borderline;1
+22;Homme;1;0;0;0;1;1;0;1;0;0;0;Hémoglobine élevée et tabagisme détecté avec des vertiges.;In Danger;1
+45;Femme;0;0;0;0;0;0;0;0;0;0;0;La patiente ne présente aucune anomalie ou immunoglobuline détectée.;None;0
+30;Homme;1;1;0;0;0;0;0;0;1;0;0;Hémoglobine A1C élevée et microalbumine détectée, mais aucune récidive.;In Danger;1
+33;Femme;0;0;1;0;0;0;1;1;0;0;0;Hypercholestérolémie et récidive signalées dans le dossier.;Borderline;1
+25;Homme;1;0;0;0;0;0;0;0;0;0;0;Un taux d'hémoglobine élevé est signalé, mais sans autre symptôme.;In Danger;1
+40;Femme;0;0;0;0;0;0;0;0;0;0;0;La patiente ne semble pas avoir de rechute ou d'anticorps détectés.;None;0
+29;Homme;1;0;1;1;1;0;0;0;0;0;0;Le patient est fumeur, en surpoids, et présente une hémoglobine élevée.;Early onset;1
+37;Femme;0;1;0;0;0;0;1;0;0;0;0;Microalbumine et cholestérol détectés, mais aucune réaction.;Borderline;1
+45;Homme;0;0;0;0;0;0;0;0;0;0;0;Aucun signe d'anomalie, de rechute ou de tabagisme.;None;0
+25;Femme;1;1;1;1;1;1;1;1;0;0;0;La patiente présente plusieurs déclencheurs, y compris une albumine détectée.;Early onset;1
+32;Homme;0;0;0;0;0;0;1;1;0;0;0;Des étourdissements et un taux de cholestérol élevé ont été notés.;Borderline;1
+50;Femme;0;0;0;0;0;0;0;0;0;0;0;Aucun élément n'indique une hémoglobine ou une microalbumine anormale.;None;0
+40;Femme;0;0;0;0;0;0;0;0;0;0;0;La patiente ne présente aucun signe d'anomalie ni d'immunoglobuline détectée.;None;0
+32;Homme;1;0;0;0;0;0;0;0;0;0;0;Un taux d'hémoglobine élevé est détecté, mais aucune protéinurie n'a été trouvée.;In Danger;1
+50;Femme;0;1;0;0;0;0;1;1;0;0;0;Des lipides anormaux et une microalbumine détectée sont signalés dans le dossier.;Borderline;1
+25;Homme;0;0;1;1;1;0;0;0;0;0;0;Fumeur avec un surpoids modéré, mais aucun taux d'hémoglobine élevé n'a été observé.;In Danger;1
+30;Femme;1;1;0;0;0;0;0;0;1;0;0;Microalbumine détectée avec une récidive, mais pas de signe de tabac.;In Danger;1
+45;Homme;0;0;0;0;0;0;1;1;0;0;0;Hypercholestérolémie et des vertiges légers notés dans le dossier.;Borderline;1
+28;Femme;1;0;1;1;1;1;0;0;0;0;0;La patiente présente une hémoglobine élevée, un surpoids, mais aucune récidive n'est signalée.;Early onset;1
+36;Homme;0;0;0;0;0;0;0;0;0;0;0;Le patient n'a aucun symptôme ni anomalie détectés dans les notes médicales.;None;0
+24;Femme;1;0;0;0;0;0;0;0;0;1;1;Hémoglobine élevée et une réaction immunitaire détectée, mais aucune rechute.;In Danger;1
+29;Homme;1;1;1;1;1;1;0;0;0;0;0;Fumeur, avec plusieurs déclencheurs, y compris un taux d'hémoglobine et une microalbumine élevés.;Early onset;1
+40;Femme;0;0;0;0;0;0;1;0;0;0;0;Hypercholestérolémie signalée sans aucune indication d'anomalie.;Borderline;1
+50;Homme;0;0;0;0;0;0;0;0;0;0;0;Le patient n'a aucune trace de microalbumine ou de protéines urinaires.;None;0
+25;Femme;1;1;1;1;1;1;1;1;1;1;1;La patiente présente tous les déclencheurs possibles, y compris une immunoglobuline élevée.;Early onset;1
+33;Homme;1;0;0;0;1;0;1;0;0;0;0;Un taux d'hémoglobine élevé avec des lipides anormaux et un tabac actif.;In Danger;1
+30;Homme;1;0;0;0;0;0;0;0;0;0;0;Le patient ne présente aucun signe de microalbumine.;None;0
+25;Femme;0;0;0;0;0;0;0;0;0;0;0;Aucune trace de microalbumine n'a été détectée.;None;0
+40;Homme;0;0;0;0;0;0;0;0;0;0;0;L'analyse montre que la microalbumine est exclue.;None;0
+35;Femme;0;0;0;0;0;0;0;0;0;0;0;Il n'y a aucune indication de microalbumine dans les résultats.;None;0
+28;Homme;0;0;0;0;0;0;0;0;0;0;0;Les tests ne révèlent pas la présence de microalbumine.;None;0
+45;Femme;0;0;0;0;0;0;0;0;0;0;0;La microalbumine n'a pas été trouvée lors des analyses.;None;0
+50;Homme;0;0;0;0;0;0;0;0;0;0;0;Les résultats montrent qu'il ne contient pas de microalbumine.;None;0
+38;Femme;0;0;0;0;0;0;0;0;0;0;0;Les échantillons ne comportent pas de microalbumine détectable.;None;0
+32;Homme;0;0;0;0;0;0;0;0;0;0;0;Aucune protéinurie associée à la microalbumine n'a été notée.;None;0
+29;Femme;0;0;0;0;0;0;0;0;0;0;0;La protéinurie n'indique pas de microalbumine.;None;0
+30;Homme;1;0;0;0;0;0;0;0;0;0;0;Le patient ne présente aucun signe de microalbumine.;None;0
+25;Femme;0;0;0;0;0;0;0;0;0;0;0;Aucune trace de microalbumine n'a été détectée.;None;0
+40;Homme;0;0;0;0;0;0;0;0;0;0;0;L'analyse montre que la microalbumine est exclue.;None;0
+35;Femme;0;0;0;0;0;0;0;0;0;0;0;Il n'y a aucune indication de microalbumine dans les résultats.;None;0
+28;Homme;0;0;0;0;0;0;0;0;0;0;0;Les tests ne révèlent pas la présence de microalbumine.;None;0
+45;Femme;0;0;0;0;0;0;0;0;0;0;0;La microalbumine n'a pas été trouvée lors des analyses.;None;0
+50;Homme;0;0;0;0;0;0;0;0;0;0;0;Les résultats montrent qu'il ne contient pas de microalbumine.;None;0
+38;Femme;0;0;0;0;0;0;0;0;0;0;0;Les échantillons ne comportent pas de microalbumine détectable.;None;0
+32;Homme;0;0;0;0;0;0;0;0;0;0;0;Aucune protéinurie associée à la microalbumine n'a été notée.;None;0
+29;Femme;0;0;0;0;0;0;0;0;0;0;0;La protéinurie n'indique pas de microalbumine.;None;0
+37;Homme;0;0;0;0;0;0;0;0;0;0;0;Le patient n'a pas de microalbumine dans les résultats.;None;0
+42;Femme;0;0;0;0;0;0;0;0;0;0;0;Jamais aucune microalbumine n'a été détectée.;None;0
+34;Homme;0;0;0;0;0;0;0;0;0;0;0;Il n'y a aucun élément de preuve pour la microalbumine.;None;0
+31;Femme;0;0;0;0;0;0;0;0;0;0;0;Les analyses montrent zéro microalbumine.;None;0
+39;Homme;0;0;0;0;0;0;0;0;0;0;0;Les tests ne montrent pas la présence de microalbumine.;None;0
+41;Femme;0;0;0;0;0;0;0;0;0;0;0;Non détecté : la microalbumine est absente.;None;0
+26;Homme;0;0;0;0;0;0;0;0;0;0;0;Les analyses ne comportent pas de microalbumine.;None;0
+33;Femme;0;0;0;0;0;0;0;0;0;0;0;Le patient est sans microalbumine dans les échantillons.;None;0
+30;Homme;1;0;0;0;0;0;0;0;0;0;0;La microalbumine n'est plus détectée dans les analyses récentes.;None;0
+25;Femme;0;0;0;0;0;0;0;0;0;0;0;Les tests ne révèlent pas la présence de microalbumine.;None;0
+40;Homme;0;0;0;0;0;0;0;0;0;0;0;Le patient ne présente pas de trace de microalbumine.;None;0
+35;Femme;0;0;0;0;0;0;0;0;0;0;0;Aucune trace de microalbumine n'a été détectée dans les échantillons.;None;0
+28;Homme;0;0;0;0;0;0;0;0;0;0;0;Les résultats n'indiquent pas de microalbumine détectée.;None;0
+45;Femme;0;0;0;0;0;0;0;0;0;0;0;Les analyses ne contiennent pas de microalbumine.;None;0
+50;Homme;0;0;0;0;0;0;0;0;0;0;0;Le patient ne souffre pas de conditions liées à la microalbumine.;None;0
+38;Femme;0;0;0;0;0;0;0;0;0;0;0;Aucune trace de microalbumine n'est signalée dans les résultats.;None;0
+32;Homme;0;0;0;0;0;0;0;0;0;0;0;Les tests ne démontrent pas la présence de microalbumine.;None;0
+29;Femme;0;0;0;0;0;0;0;0;0;0;0;La protéinurie ne semble pas indiquer de microalbumine.;None;0
+37;Homme;0;0;0;0;0;0;0;0;0;0;0;Les échantillons n'ont pas permis de trouver de microalbumine.;None;0
+42;Femme;0;0;0;0;0;0;0;0;0;0;0;La microalbumine ne figure pas dans les résultats d'analyse.;None;0
+34;Homme;0;0;0;0;0;0;0;0;0;0;0;Les résultats n'indiquent aucun signe de microalbumine.;None;0
+31;Femme;0;0;0;0;0;0;0;0;0;0;0;Les analyses ne comportent aucun élément lié à la microalbumine.;None;0
+39;Homme;0;0;0;0;0;0;0;0;0;0;0;Il n'y a aucune indication de microalbumine dans les tests.;None;0
+41;Femme;0;0;0;0;0;0;0;0;0;0;0;Les résultats ne disposent pas de données concernant la microalbumine.;None;0
+26;Homme;0;0;0;0;0;0;0;0;0;0;0;Pas retrouvé : la microalbumine est absente des résultats.;None;0
+33;Femme;0;0;0;0;0;0;0;0;0;0;0;Les échantillons analysés ne contiennent aucune microalbumine.;None;0
+30;Homme;1;0;0;0;0;0;0;0;0;0;0;Hémoglobine élevée, mais pas de récidive ni de microalbumine détectée.;None;0
+28;Femme;1;0;0;0;0;0;0;0;0;0;0;Le patient n'a montré aucun signe de microalbumine ni d'autres anomalies.;None;0
+35;Homme;0;0;0;0;0;0;0;0;0;0;0;Pas de microalbumine ni de protéinurie détectée dans les résultats.;None;0
+29;Femme;0;0;0;0;0;0;0;0;0;0;0;Aucune trace de microalbumine ni d'albumine détectée dans les tests.;None;0
+45;Homme;0;0;0;0;0;0;0;0;0;0;0;Les analyses ne montrent pas de microalbumine, ni d'autres anomalies.;None;0
+30;Homme;1;0;0;0;0;0;0;0;0;0;0;"Hémoglobine élevée, mais pas de récidive ni de microalbumine détectée.";None;0
