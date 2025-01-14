@@ -5,14 +5,22 @@ namespace Frontend.Models
     public class PatientModel
     {
         public int Id { get; set; }
+        [Required(ErrorMessage = "First Name is required")]
         public string FirstName { get; set; } = string.Empty;
+
+        [Required(ErrorMessage = "Last Name is required")]
         public string LastName { get; set; } = string.Empty;
+
         [DataType(DataType.Date)]
         [Range(typeof(DateTime), "1900-01-01", "2100-12-31", ErrorMessage = "Date of Birth must be between 1900 and 2100.")]
         [MaxDate(ErrorMessage = "Date of Birth cannot be in the future.")]
         public DateTime DateOfBirth { get; set; }
+
+        [Required(ErrorMessage = "Gender is required")]
         public string Gender { get; set; } = string.Empty;
+
         public string Address { get; set; } = string.Empty;
+
         [RegularExpression(@"^\d{3}-\d{3}-\d{4}$|^\d{10}$", ErrorMessage = "Phone number must be in the format 111-222-3333 or 1112223333.")]
         public string PhoneNumber { get; set; } = string.Empty;
     }

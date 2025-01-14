@@ -1,4 +1,5 @@
-﻿using NoteService.Domain;
+﻿using MongoDB.Bson;
+using NoteService.Domain;
 
 namespace NoteService.Repositories
 {
@@ -20,14 +21,14 @@ namespace NoteService.Repositories
         /// </summary>
         /// <param name="id">The ID of the Note entity to delete.</param>
         /// <returns>A task representing the asynchronous operation. The result is the deleted Note entity, or null if not found.</returns>
-        Task<NoteDomain?> DeleteById(string id);
+        Task<NoteDomain?> DeleteById(ObjectId id);
 
         /// <summary>
         /// Asynchronously retrieves a Note entity by its ID.
         /// </summary>
         /// <param name="id">The ID of the Note entity to retrieve.</param>
         /// <returns>A task representing the asynchronous operation. The result is the Note entity, or null if not found.</returns>
-        Task<NoteDomain?> GetById(string id);
+        Task<NoteDomain?> GetById(ObjectId id);
 
         /// <summary>
         /// Asynchronously retrieves a Note entity by its ID.

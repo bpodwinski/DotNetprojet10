@@ -6,6 +6,7 @@
 @using Models
 @using Frontend.Services
 @using Frontend.Locales
+@using Layout
 
 @inject CustomHttpClient CustomHttpClient
 @inject IStringLocalizer<Resource> Localizer
@@ -29,6 +30,7 @@
 
                 <div class="card-body">
                     @note.Note
+                    <button class="btn btn-secondary" @onclick="() => DeleteNoteAsync(note.Id)"><i class="bi bi-trash"></i> @Localizer["Delete"]</button>
                 </div>
             </div>
         }
@@ -46,21 +48,27 @@ else
 }
 
 @code {
+    [CascadingParameter]
+    private MainLayout Layout { get; set; } = default!;
+
     [Parameter]
     public int PatientId { get; set; }
 
     private List<NoteModel>? notes = null;
     private bool isNotesLoading = true;
+    private string statusMessage = string.Empty;
 
     protected override async Task OnParametersSetAsync()
     {
         await LoadPatientNotes();
+        StateHasChanged();
     }
 
     public async Task LoadPatientNotes()
     {
         try
         {
+            isNotesLoading = true;
             var response = await CustomHttpClient.GetAsync($"notes/patientid/{PatientId}");
             if (response.IsSuccessStatusCode)
             {
@@ -69,11 +77,43 @@ else
                     {
                         PropertyNameCaseInsensitive = true
                     });
+
+                notes ??= new List<NoteModel>();
             }
         }
         catch (Exception ex)
         {
             Console.WriteLine($"Error loading notes for patient: {ex.Message}");
+            notes = new List<NoteModel>();
+        }
+        finally
+        {
+            isNotesLoading = false;
+            StateHasChanged();
+        }
+    }
+
+    private async Task DeleteNoteAsync(string noteId)
+    {
+        try
+        {
+            isNotesLoading = true;
+
+            var response = await CustomHttpClient.DeleteAsync($"notes/{noteId}");
+
+            if (response.IsSuccessStatusCode)
+            {
+                await LoadPatientNotes();
+                Layout.ShowToast(Localizer["NoteDeletedSuccess"], Localizer["The note has been successfully deleted"]);
+            }
+            else
+            {
+                Layout.ShowToast(Localizer["NoteDeletedFailed"], Localizer["Failed to delete the note."]);
+            }
+        }
+        catch (Exception ex)
+        {
+            Layout.ShowToast(Localizer["ErrorDeletingNote"], $"Error: {ex.Message}");
         }
         finally
         {

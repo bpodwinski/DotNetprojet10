@@ -66,7 +66,6 @@ namespace NoteService.Controllers
             {
                 _logger.LogInformation("Fetching Note items for Patient ID {Id}.", id);
 
-                // Appeler le service pour récupérer les notes
                 var notes = await _noteService.GetByPatientId(id);
 
                 if (notes == null || notes.Count == 0)

@@ -45,8 +45,19 @@ namespace NoteService.Services
         {
             try
             {
-                var deletedNote = await _noteRepository.DeleteById(id);
-                return deletedNote is not null ? ToNoteDTO(deletedNote) : null;
+                if (!ObjectId.TryParse(id, out var objectId))
+                {
+                    throw new ArgumentException($"The ID {id} is not a valid ObjectId.");
+                }
+
+                var deletedNote = await _noteRepository.DeleteById(objectId);
+
+                if (deletedNote is null)
+                {
+                    return null;
+                }
+
+                return ToNoteDTO(deletedNote);
             }
             catch (Exception ex)
             {
@@ -63,7 +74,12 @@ namespace NoteService.Services
         {
             try
             {
-                var note = await _noteRepository.GetById(id);
+                if (!ObjectId.TryParse(id, out var objectId))
+                {
+                    throw new ArgumentException($"The ID {id} is not a valid ObjectId.");
+                }
+
+                var note = await _noteRepository.GetById(objectId);
                 return note is not null ? ToNoteDTO(note) : null;
             }
             catch (Exception ex)
@@ -119,14 +135,19 @@ namespace NoteService.Services
         {
             try
             {
-                var existingNote = await _noteRepository.GetById(id);
+                if (!ObjectId.TryParse(id, out var objectId))
+                {
+                    throw new ArgumentException($"The ID {id} is not a valid ObjectId.");
+                }
+
+                var existingNote = await _noteRepository.GetById(objectId);
                 if (existingNote == null)
                 {
                     throw new Exception($"Note with ID {id} not found.");
                 }
 
                 var note = ToNote(dto);
-                note.Id = id;
+                note.Id = ObjectId.Parse(id);
 
                 var updatedNote = await _noteRepository.Update(note);
                 return updatedNote != null ? ToNoteDTO(updatedNote) : null;
@@ -144,7 +165,7 @@ namespace NoteService.Services
         /// <returns>The corresponding NoteDomain entity.</returns>
         private static NoteDomain ToNote(NoteDTO dto) => new()
         {
-            Id = dto.Id,
+            Id = dto.Id != null ? ObjectId.Parse(dto.Id) : ObjectId.Empty,
             PatientId = dto.PatientId,
             Note = dto.Note
         };
@@ -156,7 +177,7 @@ namespace NoteService.Services
         /// <returns>The corresponding NoteDTO.</returns>
         private static NoteDTO ToNoteDTO(NoteDomain noteDomain) => new()
         {
-            Id = noteDomain.Id,
+            Id = noteDomain.Id != ObjectId.Empty ? noteDomain.Id.ToString() : null,
             PatientId = noteDomain.PatientId,
             Note = noteDomain.Note,
             Date = noteDomain.Date

@@ -22,42 +22,93 @@
             <div class="card-body">
                 <EditForm Model="newPatient" OnValidSubmit="HandleValidSubmit">
                     <DataAnnotationsValidator />
-                    <ValidationSummary />
 
                     <div class="mb-3">
                         <label class="form-label">@Localizer["FirstName"]</label>
                         <InputText @bind-Value="newPatient.FirstName" class="form-control" />
+                        <ValidationMessage For="() => newPatient.FirstName" />
+                        @if (fieldErrors.ContainsKey(nameof(newPatient.FirstName)))
+                        {
+                            @foreach (var error in fieldErrors[nameof(newPatient.FirstName)])
+                            {
+                                <div class="text-danger">@error</div>
+                            }
+                        }
                     </div>
+
                     <div class="mb-3">
                         <label class="form-label">@Localizer["LastName"]</label>
                         <InputText @bind-Value="newPatient.LastName" class="form-control" />
+                        <ValidationMessage For="() => newPatient.LastName" />
+                        @if (fieldErrors.ContainsKey(nameof(newPatient.LastName)))
+                        {
+                            @foreach (var error in fieldErrors[nameof(newPatient.LastName)])
+                            {
+                                <div class="text-danger">@error</div>
+                            }
+                        }
                     </div>
+
                     <div class="mb-3">
                         <label class="form-label">@Localizer["BirthDate"]</label>
                         <InputDate @bind-Value="newPatient.DateOfBirth" class="form-control"
                                    min="1900-01-01" max="@MaxDate.ToString("yyyy-MM-dd")" />
                         <ValidationMessage For="() => newPatient.DateOfBirth" />
-
+                        @if (fieldErrors.ContainsKey(nameof(newPatient.DateOfBirth)))
+                        {
+                            @foreach (var error in fieldErrors[nameof(newPatient.DateOfBirth)])
+                            {
+                                <div class="text-danger">@error</div>
+                            }
+                        }
                     </div>
+
                     <div class="mb-3">
                         <label class="form-label">@Localizer["Gender"]</label>
                         <InputSelect @bind-Value="newPatient.Gender" class="form-control">
                             <option value="Male">@Localizer["Male"]</option>
                             <option value="Female">@Localizer["Female"]</option>
                         </InputSelect>
+                        <ValidationMessage For="() => newPatient.Gender" />
+                        @if (fieldErrors.ContainsKey(nameof(newPatient.Gender)))
+                        {
+                            @foreach (var error in fieldErrors[nameof(newPatient.Gender)])
+                            {
+                                <div class="text-danger">@error</div>
+                            }
+                        }
                     </div>
+
                     <div class="mb-3">
                         <label class="form-label">@Localizer["Address"]</label>
                         <InputText @bind-Value="newPatient.Address" class="form-control" />
+                        <ValidationMessage For="() => newPatient.Address" />
+                        @if (fieldErrors.ContainsKey(nameof(newPatient.Address)))
+                        {
+                            @foreach (var error in fieldErrors[nameof(newPatient.Address)])
+                            {
+                                <div class="text-danger">@error</div>
+                            }
+                        }
                     </div>
+
                     <div class="mb-3">
                         <label class="form-label">@Localizer["Phone"]</label>
                         <InputText @bind-Value="newPatient.PhoneNumber" class="form-control" />
                         <ValidationMessage For="() => newPatient.PhoneNumber" />
+                        @if (fieldErrors.ContainsKey(nameof(newPatient.PhoneNumber)))
+                        {
+                            @foreach (var error in fieldErrors[nameof(newPatient.PhoneNumber)])
+                            {
+                                <div class="text-danger">@error</div>
+                            }
+                        }
                     </div>
 
-                    <button type="button" class="btn btn-secondary" @onclick="GoBack">@Localizer["Cancel"]</button>
-                    <button type="submit" class="btn btn-primary">@Localizer["Add"]</button>
+                    <div class="d-flex justify-content-between">
+                        <button type="button" class="btn btn-secondary" @onclick="GoBack">@Localizer["Cancel"]</button>
+                        <button type="submit" class="btn btn-primary">@Localizer["Add"]</button>
+                    </div>
                 </EditForm>
             </div>
         </div>
@@ -75,14 +126,16 @@
             DateOfBirth = DateTime.Today
         };
     private string statusMessage = string.Empty;
+    private string globalErrorMessage = string.Empty;
+    private Dictionary<string, List<string>> fieldErrors = new();
     private DateTime MaxDate { get; set; } = DateTime.Today;
-
 
     private async Task HandleValidSubmit()
     {
         try
         {
             var response = await CustomHttpClient.PostAsync("patients", newPatient);
+
             if (response.IsSuccessStatusCode)
             {
                 statusMessage = Localizer["PatientAdded"];
@@ -90,7 +143,27 @@
             }
             else
             {
-                statusMessage = Localizer["ErrorAddingPatient"];
+                var errorResponse = await response.Content.ReadFromJsonAsync<ValidationErrorModel>();
+
+                if (errorResponse?.Errors != null)
+                {
+                    globalErrorMessage = string.Empty;
+                    fieldErrors.Clear();
+
+                    foreach (var error in errorResponse.Errors)
+                    {
+                        if (!fieldErrors.ContainsKey(error.Key))
+                        {
+                            fieldErrors[error.Key] = new List<string>();
+                        }
+
+                        fieldErrors[error.Key].AddRange(error.Value);
+                    }
+                }
+                else
+                {
+                    globalErrorMessage = Localizer["ErrorAddingPatient"];
+                }
             }
         }
         catch (Exception ex)

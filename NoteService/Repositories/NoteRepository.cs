@@ -1,4 +1,5 @@
-﻿using MongoDB.Driver;
+﻿using MongoDB.Bson;
+using MongoDB.Driver;
 using NoteService.Data;
 using NoteService.Domain;
 
@@ -42,19 +43,19 @@ namespace NoteService.Repositories
         /// </summary>
         /// <param name="id">The ID of the Note entity to delete.</param>
         /// <returns>The deleted Note entity, or null if not found.</returns>
-        public async Task<NoteDomain?> DeleteById(string id)
+        public async Task<NoteDomain?> DeleteById(ObjectId id)
         {
             try
             {
-                var result = await _notesCollection.DeleteOneAsync(note => note.Id == id);
-                if (result.DeletedCount == 0)
+                var deletedNote = await _notesCollection.FindOneAndDeleteAsync(note => note.Id == id);
+                if (deletedNote == null)
                 {
-                    _logger.LogWarning("Attempted to delete Note with ID {Id}, but it was not found.", id);
+                    _logger.LogWarning("Note with ID {Id} not found.", id);
                     return null;
                 }
 
                 _logger.LogInformation("Successfully deleted Note with ID {Id}.", id);
-                return null; // MongoDB doesn't return the deleted document by default
+                return deletedNote;
             }
             catch (Exception ex)
             {
@@ -68,7 +69,7 @@ namespace NoteService.Repositories
         /// </summary>
         /// <param name="id">The ID of the Note entity to retrieve.</param>
         /// <returns>The Note entity, or null if not found.</returns>
-        public async Task<NoteDomain?> GetById(string id)
+        public async Task<NoteDomain?> GetById(ObjectId id)
         {
             try
             {
@@ -104,7 +105,6 @@ namespace NoteService.Repositories
             {
                 var filter = Builders<NoteDomain>.Filter.Eq(note => note.PatientId, id);
 
-                // Define the sort definition based on input
                 var sortDefinition = isDescending
                     ? Builders<NoteDomain>.Sort.Descending(sortBy)
                     : Builders<NoteDomain>.Sort.Ascending(sortBy);

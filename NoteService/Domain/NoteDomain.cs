@@ -7,7 +7,8 @@ namespace NoteService.Domain
     {
         [BsonId]
         [BsonRepresentation(BsonType.ObjectId)]
-        public string Id { get; set; }
+        public ObjectId Id { get; set; }
+
         public required int PatientId { get; set; }
         public required string Note { get; set; }
 
