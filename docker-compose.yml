@@ -18,6 +18,71 @@ services:
     networks:
       - ocp10_network
 
+  elasticsearch:
+    image: elasticsearch:8.17.0
+    container_name: ocp10_elasticsearch
+    environment:
+      - discovery.type=single-node
+      - xpack.security.enabled=false
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+    ports:
+      - "9200:9200"
+    volumes:
+      - es_data:/usr/share/elasticsearch/data
+    networks:
+      - ocp10_network
+
+  kibana:
+    image: kibana:8.17.0
+    container_name: ocp10_kibana
+    environment:
+      - ELASTICSEARCH_HOSTS=http://ocp10_elasticsearch:9200
+    ports:
+      - "5601:5601"
+    depends_on:
+      - elasticsearch
+    networks:
+      - ocp10_network
+
+  authdb:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: ocp10_authdb
+    ports:
+      - "1434:1433"
+    volumes:
+      - authdb:/var/opt/mssql
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "YourP@ssword123!"
+    networks:
+      - ocp10_network
+
+  patientdb:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: ocp10_patientdb
+    ports:
+      - "1433:1433"
+    volumes:
+      - patientdb:/var/opt/mssql
+    environment:
+      ACCEPT_EULA: "Y"
+      MSSQL_SA_PASSWORD: "YourP@ssword123!"
+    networks:
+      - ocp10_network
+
+  notedb:
+    image: mongo:latest
+    container_name: ocp10_notedb
+    ports:
+      - "27017:27017"
+    volumes:
+      - notedb:/data/db
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: "root"
+      MONGO_INITDB_ROOT_PASSWORD: "YourPassword123"
+    networks:
+      - ocp10_network
+
   frontend:
     image: ${DOCKER_REGISTRY-}frontend
     container_name: ocp10_frontend
@@ -45,19 +110,6 @@ services:
     networks:
       - ocp10_network
 
-  authdb:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: ocp10_authdb
-    ports:
-      - "1434:1433"
-    volumes:
-      - authdb:/var/opt/mssql
-    environment:
-      ACCEPT_EULA: "Y"
-      MSSQL_SA_PASSWORD: "YourP@ssword123!"
-    networks:
-      - ocp10_network
-
   patientservice:
     image: ${DOCKER_REGISTRY-}patientservice
     container_name: ocp10_patientservice
@@ -71,19 +123,6 @@ services:
       JWT_AUDIENCE: ${JWT_AUDIENCE}
     depends_on:
       - patientdb
-    networks:
-      - ocp10_network
-
-  patientdb:
-    image: mcr.microsoft.com/mssql/server:2022-latest
-    container_name: ocp10_patientdb
-    ports:
-      - "1433:1433"
-    volumes:
-      - patientdb:/var/opt/mssql
-    environment:
-      ACCEPT_EULA: "Y"
-      MSSQL_SA_PASSWORD: "YourP@ssword123!"
     networks:
       - ocp10_network
 
@@ -103,19 +142,6 @@ services:
     networks:
       - ocp10_network
 
-  notedb:
-    image: mongo:latest
-    container_name: ocp10_notedb
-    ports:
-      - "27017:27017"
-    volumes:
-      - notedb:/data/db
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: "root"
-      MONGO_INITDB_ROOT_PASSWORD: "YourPassword123"
-    networks:
-      - ocp10_network
-
   reportservice:
     image: ${DOCKER_REGISTRY-}reportservice
     container_name: ocp10_reportservice
@@ -127,6 +153,8 @@ services:
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       JWT_ISSUER: ${JWT_ISSUER}
       JWT_AUDIENCE: ${JWT_AUDIENCE}
+    depends_on:
+      - elasticsearch
     networks:
       - ocp10_network
 
@@ -135,6 +163,7 @@ volumes:
   patientdb:
   notedb:
   keys:
+  es_data:
   
 networks:
   ocp10_network:

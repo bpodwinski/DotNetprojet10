@@ -1,5 +1,4 @@
 ﻿using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Logging;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
@@ -131,10 +130,19 @@ builder.Services.AddAuthorization(options =>
     });
 });
 
+// Lire l'URI Elasticsearch à partir de la configuration
+var elasticUri = builder.Configuration["Elasticsearch:Uri"];
+if (string.IsNullOrWhiteSpace(elasticUri))
+{
+    throw new Exception("L'URI Elasticsearch n'est pas configuré.");
+}
+
 // Register repositories and services
 builder.Services.AddScoped<IPatientRepository, PatientRepository>();
 builder.Services.AddScoped<INoteRepository, NoteRepository>();
 builder.Services.AddScoped<IReportService, ReportService.Services.ReportService>();
+builder.Services.AddScoped<IElasticsearchService>(provider => new ElasticsearchService(elasticUri));
+
 
 // Configure DI for IModelTrainer
 builder.Services.AddScoped<IModelTrainer>(sp =>
@@ -158,7 +166,6 @@ builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 // Modifier l'enregistrement de ModelInitializer
 builder.Services.AddScoped<ModelInitializer>();
 
-
 builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();
 
@@ -172,6 +179,14 @@ using (var scope = app.Services.CreateScope())
 {
     var modelInitializer = scope.ServiceProvider.GetRequiredService<ModelInitializer>();
     modelInitializer.Initialize();
+}
+
+// Ajouter les déclencheurs dans Elasticsearch au démarrage
+using (var scope = app.Services.CreateScope())
+{
+    var elasticsearchService = scope.ServiceProvider.GetRequiredService<IElasticsearchService>();
+    await elasticsearchService.CreateIndexAsync("trigger_terms_index");
+    await elasticsearchService.BulkIndexTriggerTermsAsync();
 }
 
 // Apply middleware

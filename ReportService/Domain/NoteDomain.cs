@@ -5,5 +5,6 @@ namespace ReportService.Domain
         public string Id { get; set; }
         public int PatientId { get; set; }
         public string Note { get; set; }
+        public DateTime Date { get; set; } = DateTime.UtcNow;
     }
 }

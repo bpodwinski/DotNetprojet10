@@ -8,15 +8,34 @@ namespace ReportService.Services
     /// </summary>
     public class ReportService : IReportService
     {
+        private readonly IElasticsearchService _elasticSearchService;
         private readonly IMachineLearningService _machineLearningService;
         private IPatientRepository _patientRepository;
         private INoteRepository _noteRepository;
 
-        public ReportService(IPatientRepository patientRepository,INoteRepository noteRepository, IMachineLearningService machineLearningService)
+        public ReportService(
+            IPatientRepository patientRepository,
+            INoteRepository noteRepository,
+            IMachineLearningService machineLearningService,
+            IElasticsearchService elasticSearchService
+        )
         {
             _patientRepository = patientRepository;
             _noteRepository = noteRepository;
             _machineLearningService = machineLearningService ?? throw new ArgumentNullException(nameof(machineLearningService));
+            _elasticSearchService = elasticSearchService;
+        }
+
+        public class TriggerTerm
+        {
+            public string Term { get; set; }
+            public string Category { get; set; }
+
+            public TriggerTerm(string term, string category)
+            {
+                Term = term;
+                Category = category;
+            }
         }
 
         /// <summary>
@@ -47,22 +66,68 @@ namespace ReportService.Services
                     };
                 }
 
-                // Initialiser une liste pour collecter les déclencheurs détectés
-                var foundTriggers = new HashSet<string>();
+                // Supprimer les anciennes notes du patient
+                await _elasticSearchService.DeleteNotesByPatientIdAsync("medical_notes", id);
 
-                // Parcourir chaque note pour détecter les déclencheurs
+                // Indexer les nouvelles notes dans Elasticsearch
                 foreach (var note in notes)
                 {
                     if (!string.IsNullOrWhiteSpace(note.Note))
                     {
-                        // Utiliser TriggerAnalyzer pour détecter les déclencheurs dans la note
-                        var detectedTriggers = _machineLearningService.IdentifyTriggers(new Models.MachineLearningInputModel { Notes = note.Note });
-                        foreach (var trigger in detectedTriggers)
+                        var document = new ElasticsearchService.MedicalNote
                         {
-                            foundTriggers.Add(trigger);
-                        }
+                            NoteId = note.Id,
+                            PatientId = id,
+                            Note = note.Note,
+                            Date = note.Date
+                        };
+
+                        await _elasticSearchService.IndexDocumentAsync("medical_notes", document);
                     }
                 }
+
+                var triggerTerms = new List<TriggerTerm>
+                {
+                    new TriggerTerm("Hémoglobine A1C", "Biologique"),
+                    new TriggerTerm("Microalbumine", "Biologique"),
+                    new TriggerTerm("Taille", "Physique"),
+                    new TriggerTerm("Poids", "Physique"),
+                    new TriggerTerm("Fumeur", "Habitude"),
+                    new TriggerTerm("Fumeuse", "Habitude"),
+                    new TriggerTerm("Anormal", "État"),
+                    new TriggerTerm("Cholestérol", "Biologique"),
+                    new TriggerTerm("Vertiges", "Symptôme"),
+                    new TriggerTerm("Rechute", "Symptôme"),
+                    new TriggerTerm("Réaction", "Symptôme"),
+                    new TriggerTerm("Anticorps", "Biologique")
+                };
+
+                var terms = triggerTerms.Select(t => t.Term).ToList();
+                var allNotes = string.Join(" ", notes.Select(n => n.Note));
+
+                var detectedTriggers = await _elasticSearchService.SearchAsync(
+                    indexName: "medical_notes",
+                    terms: terms,
+                    patientId: id
+                );
+
+                var foundTriggers = detectedTriggers?
+                    .SelectMany(note => note.DetectedTriggers)
+                    .ToHashSet() ?? new HashSet<string>();
+
+                // Parcourir chaque note pour détecter les déclencheurs avec MachineLearningInputModel
+                //foreach (var note in notes)
+                //{
+                //    if (!string.IsNullOrWhiteSpace(note.Note))
+                //    {
+                //        // Utiliser TriggerAnalyzer pour détecter les déclencheurs dans la note
+                //        var detectedTriggers = _machineLearningService.IdentifyTriggers(new Models.MachineLearningInputModel { Notes = note.Note });
+                //        foreach (var trigger in detectedTriggers)
+                //        {
+                //            foundTriggers.Add(trigger);
+                //        }
+                //    }
+                //}
 
                 // Compter les déclencheurs
                 int triggerCount = foundTriggers.Count;
@@ -75,7 +140,7 @@ namespace ReportService.Services
                 {
                     PatientId = id,
                     RiskLevel = riskLevel,
-                    TriggerTerms = foundTriggers.ToList() // Liste des notes considérées comme des déclencheurs
+                    TriggerTerms = foundTriggers.ToList()
                 };
             }
             catch (Exception ex)
