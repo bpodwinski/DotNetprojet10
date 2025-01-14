@@ -8,5 +8,6 @@ Diagramme représentant l'architecture de l'application :
 	AuthService  -->  DbAuth[(SQL Server)]
 	PatientService  -->  DbPatient[(SQL Server)]
 	NoteService  -->  DbNote[(MongoDB)]
+	ReportService  <-->  Elasticsearch[Engine: Elasticsearch]
 	Client[Frontend: Blazor Web]  <-->  Ocelot
 ```
