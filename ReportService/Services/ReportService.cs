@@ -1,4 +1,5 @@
 ﻿using ReportService.DTOs;
+using ReportService.Models;
 using ReportService.Repositories;
 
 namespace ReportService.Services
@@ -9,33 +10,21 @@ namespace ReportService.Services
     public class ReportService : IReportService
     {
         private readonly IElasticsearchService _elasticSearchService;
-        private readonly IMachineLearningService _machineLearningService;
+        //private readonly IMachineLearningService _machineLearningService;
         private IPatientRepository _patientRepository;
         private INoteRepository _noteRepository;
 
         public ReportService(
             IPatientRepository patientRepository,
             INoteRepository noteRepository,
-            IMachineLearningService machineLearningService,
+            //IMachineLearningService machineLearningService,
             IElasticsearchService elasticSearchService
         )
         {
             _patientRepository = patientRepository;
             _noteRepository = noteRepository;
-            _machineLearningService = machineLearningService ?? throw new ArgumentNullException(nameof(machineLearningService));
+            //_machineLearningService = machineLearningService ?? throw new ArgumentNullException(nameof(machineLearningService));
             _elasticSearchService = elasticSearchService;
-        }
-
-        public class TriggerTerm
-        {
-            public string Term { get; set; }
-            public string Category { get; set; }
-
-            public TriggerTerm(string term, string category)
-            {
-                Term = term;
-                Category = category;
-            }
         }
 
         /// <summary>
@@ -62,19 +51,19 @@ namespace ReportService.Services
                     {
                         PatientId = id,
                         RiskLevel = "None",
-                        TriggerTerms = new List<string>()
+                        TriggerTerms = []
                     };
                 }
 
-                // Supprimer les anciennes notes du patient
+                // Clear existing patient notes in Elasticsearch for consistency
                 await _elasticSearchService.DeleteNotesByPatientIdAsync("medical_notes", id);
 
-                // Indexer les nouvelles notes dans Elasticsearch
+                // Index new patient notes in Elasticsearch
                 foreach (var note in notes)
                 {
                     if (!string.IsNullOrWhiteSpace(note.Note))
                     {
-                        var document = new ElasticsearchService.MedicalNote
+                        var document = new MedicalNoteModel
                         {
                             NoteId = note.Id,
                             PatientId = id,
@@ -88,18 +77,18 @@ namespace ReportService.Services
 
                 var triggerTerms = new List<TriggerTerm>
                 {
-                    new TriggerTerm("Hémoglobine A1C", "Biologique"),
-                    new TriggerTerm("Microalbumine", "Biologique"),
-                    new TriggerTerm("Taille", "Physique"),
-                    new TriggerTerm("Poids", "Physique"),
-                    new TriggerTerm("Fumeur", "Habitude"),
-                    new TriggerTerm("Fumeuse", "Habitude"),
-                    new TriggerTerm("Anormal", "État"),
-                    new TriggerTerm("Cholestérol", "Biologique"),
-                    new TriggerTerm("Vertiges", "Symptôme"),
-                    new TriggerTerm("Rechute", "Symptôme"),
-                    new TriggerTerm("Réaction", "Symptôme"),
-                    new TriggerTerm("Anticorps", "Biologique")
+                    new("Hémoglobine A1C", "Biologique"),
+                    new("Microalbumine", "Biologique"),
+                    new("Taille", "Physique"),
+                    new("Poids", "Physique"),
+                    new("Fumeur", "Habitude"),
+                    new("Fumeuse", "Habitude"),
+                    new("Anormal", "État"),
+                    new("Cholestérol", "Biologique"),
+                    new("Vertiges", "Symptôme"),
+                    new("Rechute", "Symptôme"),
+                    new("Réaction", "Symptôme"),
+                    new("Anticorps", "Biologique")
                 };
 
                 var terms = triggerTerms.Select(t => t.Term).ToList();
@@ -111,11 +100,10 @@ namespace ReportService.Services
                     patientId: id
                 );
 
-                var foundTriggers = detectedTriggers?
-                    .SelectMany(note => note.DetectedTriggers)
-                    .ToHashSet() ?? new HashSet<string>();
+                var foundTriggers = detectedTriggers
+                    .SelectMany(hit => hit.HighlightedTriggers)
+                    .ToHashSet(StringComparer.OrdinalIgnoreCase);
 
-                // Parcourir chaque note pour détecter les déclencheurs avec MachineLearningInputModel
                 //foreach (var note in notes)
                 //{
                 //    if (!string.IsNullOrWhiteSpace(note.Note))
@@ -129,18 +117,15 @@ namespace ReportService.Services
                 //    }
                 //}
 
-                // Compter les déclencheurs
                 int triggerCount = foundTriggers.Count;
 
-                // Appliquer les règles pour déterminer le niveau de risque
                 string riskLevel = CalculateRiskLevel(age, patient.Gender, triggerCount);
 
-                // Retourner le rapport
                 return new ReportDTO
                 {
                     PatientId = id,
                     RiskLevel = riskLevel,
-                    TriggerTerms = foundTriggers.ToList()
+                    TriggerTerms = [.. foundTriggers]
                 };
             }
             catch (Exception ex)
@@ -152,7 +137,7 @@ namespace ReportService.Services
         /// <summary>
         /// Determines the diabetes risk level based on age, sex, and trigger count.
         /// </summary>
-        private string CalculateRiskLevel(int age, string gender, int triggerCount)
+        private static string CalculateRiskLevel(int age, string gender, int triggerCount)
         {
             if (triggerCount == 0)
             {
@@ -196,7 +181,7 @@ namespace ReportService.Services
                 return "Early Onset";
             }
 
-            return "None"; // Cas par défaut
+            return "None";
         }
 
         /// <summary>
@@ -204,7 +189,7 @@ namespace ReportService.Services
         /// </summary>
         /// <param name="dateOfBirth">The date of birth.</param>
         /// <returns>The calculated age.</returns>
-        private int CalculateAge(DateTime dateOfBirth)
+        private static int CalculateAge(DateTime dateOfBirth)
         {
             var today = DateTime.Today;
             var age = today.Year - dateOfBirth.Year;

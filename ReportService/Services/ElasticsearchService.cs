@@ -1,15 +1,21 @@
 ﻿using Elastic.Clients.Elasticsearch;
-using Elastic.Clients.Elasticsearch.Core.Bulk;
+using ReportService.Models;
 using System.Text;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace ReportService.Services
 {
+    /// <summary>
+    /// Service for interacting with Elasticsearch to manage and search medical notes.
+    /// </summary>
     public class ElasticsearchService : IElasticsearchService
     {
         private readonly ElasticsearchClient _client;
 
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ElasticsearchService"/> class.
+        /// </summary>
+        /// <param name="elasticsearchUri">The URI of the Elasticsearch instance.</param>
         public ElasticsearchService(string elasticsearchUri)
         {
             var settings = new ElasticsearchClientSettings(new Uri(elasticsearchUri))
@@ -18,13 +24,18 @@ namespace ReportService.Services
             _client = new ElasticsearchClient(settings);
         }
 
+        /// <summary>
+        /// Checks if the specified index exists in Elasticsearch and creates it if it does not exist.
+        /// </summary>
+        /// <param name="indexName">The name of the index to check or create.</param>
+        /// <returns>True if the index was created or already exists, otherwise false.</returns>
         public async Task<bool> CreateIndexAsync(string indexName)
         {
             var response = await _client.Indices.ExistsAsync(indexName);
 
             if (!response.Exists)
             {
-                var createResponse = await _client.Indices.CreateAsync<MedicalNote>(index => index
+                var createResponse = await _client.Indices.CreateAsync<MedicalNoteModel>(index => index
                     .Index(indexName)
                     .Mappings(mappings => mappings
                         .Properties(properties => properties
@@ -41,24 +52,17 @@ namespace ReportService.Services
             return true;
         }
 
-        public class MedicalNote
-        {
-            public string NoteId { get; set; }
-            public int PatientId { get; set; }
-            public string Note { get; set; }
-            public DateTime Date { get; set; }
-            public List<string> DetectedTriggers { get; set; } = new();
-        }
-
-        public class TriggerTerm
-        {
-            public string Term { get; set; }
-            public string Category { get; set; }
-        }
-
+        /// <summary>
+        /// Indexes a document in the specified Elasticsearch index.
+        /// </summary>
+        /// <typeparam name="T">The type of the document to index.</typeparam>
+        /// <param name="indexName">The name of the index to store the document in.</param>
+        /// <param name="document">The document to index.</param>
         public async Task IndexDocumentAsync<T>(string indexName, T document)
         {
             var response = await _client.IndexAsync(document, i => i.Index(indexName));
+
+            await _client.Indices.RefreshAsync(indexName);
 
             if (!response.IsValidResponse)
             {
@@ -66,6 +70,11 @@ namespace ReportService.Services
             }
         }
 
+        /// <summary>
+        /// Deletes all notes associated with a specific patient ID from the specified Elasticsearch index.
+        /// </summary>
+        /// <param name="indexName">The name of the index.</param>
+        /// <param name="patientId">The ID of the patient whose notes should be deleted.</param>
         public async Task DeleteNotesByPatientIdAsync(string indexName, int patientId)
         {
             var indexExists = await _client.Indices.ExistsAsync(indexName);
@@ -81,7 +90,7 @@ namespace ReportService.Services
                 {
                     term = new
                     {
-                        patientId = patientId
+                        patientId
                     }
                 }
             };
@@ -99,7 +108,14 @@ namespace ReportService.Services
             Console.WriteLine($"Deleted notes: {responseBody}");
         }
 
-        public async Task<List<MedicalNote>> SearchAsync(string indexName, List<string> terms, int patientId)
+        /// <summary>
+        /// Searches for medical notes in Elasticsearch based on terms and a patient ID.
+        /// </summary>
+        /// <param name="indexName">The name of the Elasticsearch index.</param>
+        /// <param name="terms">A list of trigger terms to search for.</param>
+        /// <param name="patientId">The ID of the patient whose notes are being searched.</param>
+        /// <returns>A list of medical notes that match the search criteria.</returns>
+        public async Task<List<MedicalNoteModel>> SearchAsync(string indexName, List<string> terms, int patientId)
         {
             using var httpClient = new HttpClient();
             var elasticsearchUrl = $"http://ocp10_elasticsearch:9200/{indexName}/_search";
@@ -131,7 +147,7 @@ namespace ReportService.Services
                         {
                             term = new
                             {
-                                patientId = patientId
+                                patientId
                             }
                         }
                     }
@@ -145,94 +161,29 @@ namespace ReportService.Services
                 }
             };
 
-            // Sérialisation en JSON
             var jsonContent = JsonSerializer.Serialize(requestBody);
             var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
-            // Envoi de la requête
             var response = await httpClient.PostAsync(elasticsearchUrl, content);
             response.EnsureSuccessStatusCode();
 
-            // Analyse de la réponse
             var responseBody = await response.Content.ReadAsStringAsync();
-            var searchResponse = JsonSerializer.Deserialize<ElasticsearchSearchResponse<MedicalNote>>(responseBody);
+            var searchResponse = JsonSerializer.Deserialize<ElasticsearchSearchResponse<MedicalNoteModel>>(responseBody);
 
-            if (searchResponse?.Hits?.HitList == null)
-            {
-                return new List<MedicalNote>();
-            }
-
-            var result = new List<MedicalNote>();
+            var results = new List<MedicalNoteModel>();
             if (searchResponse?.Hits?.HitList != null)
             {
                 foreach (var hit in searchResponse.Hits.HitList)
                 {
                     if (hit.Source != null)
                     {
-                        if (hit.Highlight != null && hit.Highlight.ContainsKey("note"))
-                        {
-                            hit.Source.DetectedTriggers = hit.Highlight["note"];
-                        }
-                        result.Add(hit.Source);
+                        hit.Source.HighlightedTriggers = hit.Highlight?.GetValueOrDefault("note") ?? [];
+                        results.Add(hit.Source);
                     }
                 }
             }
 
-            return result;
-        }
-
-        public class ElasticsearchSearchResponse<T>
-        {
-            [JsonPropertyName("hits")]
-            public HitsContainer<T> Hits { get; set; }
-        }
-
-        public class HitsContainer<T>
-        {
-            [JsonPropertyName("hits")]
-            public List<Hit<T>> HitList { get; set; }
-        }
-
-        public class Hit<T>
-        {
-            [JsonPropertyName("_source")]
-            public T Source { get; set; }
-
-            [JsonPropertyName("highlight")]
-            public Dictionary<string, List<string>> Highlight { get; set; }
-        }
-
-        public async Task BulkIndexTriggerTermsAsync()
-        {
-            var triggerTerms = new List<TriggerTerm>
-            {
-                new() { Term = "Hémoglobine A1C", Category = "Biologique" },
-                new() { Term = "Microalbumine", Category = "Biologique" },
-                new() { Term = "Taille", Category = "Physique" },
-                new() { Term = "Poids", Category = "Physique" },
-                new() { Term = "Fumeur", Category = "Habitude" },
-                new() { Term = "Fumeuse", Category = "Habitude" },
-                new() { Term = "Anormal", Category = "État" },
-                new() { Term = "Cholestérol", Category = "Biologique" },
-                new() { Term = "Vertiges", Category = "Symptôme" },
-                new() { Term = "Rechute", Category = "Symptôme" },
-                new() { Term = "Réaction", Category = "Symptôme" },
-                new() { Term = "Anticorps", Category = "Biologique" }
-            };
-
-            var operations = new BulkOperationsCollection(triggerTerms.Select(term => new BulkIndexOperation<TriggerTerm>(term)));
-
-            var bulkRequest = new BulkRequest("trigger_terms_index")
-            {
-                Operations = operations
-            };
-
-            var bulkResponse = await _client.BulkAsync(bulkRequest);
-
-            if (!bulkResponse.IsValidResponse)
-            {
-                throw new Exception($"Failed to index trigger terms: {bulkResponse.ElasticsearchServerError?.Error.Reason}");
-            }
+            return results;
         }
     }
 }

@@ -186,7 +186,6 @@ using (var scope = app.Services.CreateScope())
 {
     var elasticsearchService = scope.ServiceProvider.GetRequiredService<IElasticsearchService>();
     await elasticsearchService.CreateIndexAsync("trigger_terms_index");
-    await elasticsearchService.BulkIndexTriggerTermsAsync();
 }
 
 // Apply middleware
