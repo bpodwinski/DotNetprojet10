@@ -53,12 +53,14 @@ else
     protected override async Task OnParametersSetAsync()
     {
         await LoadDiabeteReport();
+        StateHasChanged();
     }
 
     public async Task LoadDiabeteReport()
     {
         try
         {
+            isReportLoading = true;
             var response = await CustomHttpClient.GetAsync($"reports/diabete/{PatientId}");
             if (response.IsSuccessStatusCode)
             {
@@ -80,6 +82,7 @@ else
         finally
         {
             isReportLoading = false;
+            StateHasChanged();
         }
     }
 

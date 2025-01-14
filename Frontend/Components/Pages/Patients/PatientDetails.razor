@@ -33,7 +33,7 @@
                 </div>
             </div>
 
-            <DiabeteReport PatientId="PatientId" />
+            <DiabeteReport @ref="diabeteReportComponent" PatientId="PatientId" />
         </div>
 
         <div class="col-md-12 col-lg-8">
@@ -61,8 +61,10 @@
 
     private PatientModel? patient = null;
 
+    private DiabeteReport? diabeteReportComponent = null;
     private Notes? notesComponent = null;
     private NoteAdd? noteAddComponent = null;
+
 
     private bool isLoading = true;
     private bool dataLoaded = false;
@@ -119,8 +121,14 @@
         if (notesComponent != null)
         {
             await notesComponent.LoadPatientNotes();
-            StateHasChanged();
         }
+
+        if (diabeteReportComponent != null)
+        {
+            await diabeteReportComponent.LoadDiabeteReport();
+        }
+
+        StateHasChanged();
     }
 
     private void GoBack()

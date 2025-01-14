@@ -24,13 +24,15 @@
             var noteId = $"note-{note.Id}";
             <div class="card @noteId mb-4">
 
-                <div class="card-header">
+                <h5 class="card-header d-flex justify-content-between align-items-center">
                     @Localizer["NoteFrom"] @note.LocalDate
-                </div>
+                    <button class="btn btn-danger" @onclick="() => DeleteNoteAsync(note.Id)" data-bs-toggle="tooltip" data-bs-title="@Localizer[" Delete"]">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                </h5>
 
                 <div class="card-body">
                     @note.Note
-                    <button class="btn btn-secondary" @onclick="() => DeleteNoteAsync(note.Id)"><i class="bi bi-trash"></i> @Localizer["Delete"]</button>
                 </div>
             </div>
         }
@@ -70,6 +72,7 @@ else
         {
             isNotesLoading = true;
             var response = await CustomHttpClient.GetAsync($"notes/patientid/{PatientId}");
+
             if (response.IsSuccessStatusCode)
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
@@ -98,12 +101,12 @@ else
         try
         {
             isNotesLoading = true;
-
             var response = await CustomHttpClient.DeleteAsync($"notes/{noteId}");
 
             if (response.IsSuccessStatusCode)
             {
                 await LoadPatientNotes();
+
                 Layout.ShowToast(Localizer["NoteDeletedSuccess"], Localizer["The note has been successfully deleted"]);
             }
             else
