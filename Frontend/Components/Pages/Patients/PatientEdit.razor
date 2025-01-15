@@ -66,8 +66,10 @@
                             <ValidationMessage For="() => editPatient.PhoneNumber" />
                         </div>
 
-                        <a class="btn btn-secondary" role="button" href="/patients">@Localizer["Cancel"]</a>
-                        <button type="submit" class="btn btn-primary">@Localizer["Edit"]</button>
+                        <div class="d-flex justify-content-between">
+                            <a class="btn btn-secondary" role="button" href="/patients">@Localizer["Cancel"]</a>
+                            <button type="submit" class="btn btn-primary">@Localizer["Edit"]</button>
+                        </div>
                     </EditForm>
                 </div>
             </div>

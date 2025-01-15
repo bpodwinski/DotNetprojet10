@@ -213,6 +213,9 @@
   <data name="PatientDeletedSuccessTitle" xml:space="preserve">
     <value>PatientDeletedSuccessTitle</value>
   </data>
+  <data name="PatientEdit" xml:space="preserve">
+    <value>PatientEdit</value>
+  </data>
   <data name="PatientEditedSuccess" xml:space="preserve">
     <value>PatientEditedSuccess</value>
   </data>

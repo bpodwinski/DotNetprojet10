@@ -213,6 +213,9 @@
   <data name="PatientDeletedSuccessTitle" xml:space="preserve">
     <value>Patient supprimé avec succès</value>
   </data>
+  <data name="PatientEdit" xml:space="preserve">
+    <value>Modifier le patient</value>
+  </data>
   <data name="PatientEditedSuccess" xml:space="preserve">
     <value>Le patient a été modifié avec succès</value>
   </data>
