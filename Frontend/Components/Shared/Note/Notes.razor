@@ -1,18 +1,15 @@
 ﻿@page "/notes/{PatientId:int}"
 
-@using Microsoft.AspNetCore.Authorization
 @using Microsoft.Extensions.Localization
 @using System.Text.Json
 @using Models
-@using Frontend.Services
-@using Frontend.Locales
+@using Services
+@using Locales
 @using Layout
 
 @inject CustomHttpClient CustomHttpClient
 @inject IStringLocalizer<Resource> Localizer
 @inject NavigationManager NavigationManager
-
-<PageTitle>@Localizer["Notes"]</PageTitle>
 
 <h2>@Localizer["Notes"]</h2>
 

@@ -1,13 +1,12 @@
 ﻿@page "/patients/{PatientId:int}"
 
 @using System.Text.Json
-@using Frontend.Models
+@using Microsoft.Extensions.Localization
+@using Models
+@using Services
+@using Locales
 @using Frontend.Components.Shared.Diabete
 @using Frontend.Components.Shared.Note
-@using Microsoft.AspNetCore.Authorization
-@using Microsoft.Extensions.Localization
-@using Frontend.Services
-@using Frontend.Locales
 
 @inject CustomHttpClient CustomHttpClient
 @inject IStringLocalizer<Resource> Localizer
