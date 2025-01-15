@@ -21,12 +21,22 @@ namespace ReportService.Models
     public class TriggerTerm
     {
         public string Term { get; set; }
+
         public string Category { get; set; }
 
-        public TriggerTerm(string term, string category)
+        public List<string> Synonyms { get; set; } = new();
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TriggerTerm"/> class.
+        /// </summary>
+        /// <param name="term">The main term.</param>
+        /// <param name="category">The category of the term.</param>
+        /// <param name="synonyms">A list of synonyms for the term.</param>
+        public TriggerTerm(string term, string category, List<string> synonyms = null)
         {
             Term = term;
             Category = category;
+            Synonyms = synonyms ?? new List<string>();
         }
     }
 

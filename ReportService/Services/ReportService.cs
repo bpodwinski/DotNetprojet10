@@ -77,18 +77,19 @@ namespace ReportService.Services
 
                 var triggerTerms = new List<TriggerTerm>
                 {
-                    new("Hémoglobine A1C", "Biologique"),
-                    new("Microalbumine", "Biologique"),
-                    new("Taille", "Physique"),
-                    new("Poids", "Physique"),
-                    new("Fumeur", "Habitude"),
-                    new("Fumeuse", "Habitude"),
-                    new("Anormal", "État"),
-                    new("Cholestérol", "Biologique"),
-                    new("Vertiges", "Symptôme"),
-                    new("Rechute", "Symptôme"),
-                    new("Réaction", "Symptôme"),
-                    new("Anticorps", "Biologique")
+                    new("Hémoglobine A1C", "Biologique", ["HbA1C", "Hémoglobine glyquée", "Hémoglobyne A1C", "Hémoglobyne glikée"]),
+                    new("Microalbumine", "Biologique", ["Albumine urinaire", "Protéines urinaires", "Mikroalbumine", "Micralbumine"]),
+                    new("Taille", "Physique", ["Hauteur", "Stature", "Tayle", "Tail"]),
+                    new("Poids", "Physique", ["Masse corporelle", "Poid", "Poyds"]),
+                    new("Surpoids", "Physique", ["Sur poids", "Excès de poids", "Obésité", "Surpoid", "Surtpoids"]),
+                    new("Fumeur", "Habitude", ["Tabagisme", "Consommation de tabac", "Fumeure", "Fumer"]),
+                    new("Fumeuse", "Habitude", ["Tabagisme féminin", "Consommatrice de tabac", "Fumeuze", "Fumeusses"]),
+                    new("Anormal", "État", ["Irrégulier", "Pathologique", "Anormalle", "Anormale"]),
+                    new("Cholestérol", "Biologique", ["LDL", "HDL", "Triglycérides", "Cholesterole", "Colestérol"]),
+                    new("Vertiges", "Symptôme", ["Étourdissements", "Tête qui tourne", "Vertige", "Verstiges"]),
+                    new("Rechute", "Symptôme", ["Récidive", "Retour des symptômes", "Réchute", "Rechutte"]),
+                    new("Réaction", "Symptôme", ["Réaction allergique", "Effet indésirable", "Réactionne", "Réaxion"]),
+                    new("Anticorps", "Biologique", ["Immunoglobulines", "Réponse immunitaire", "Antycorps", "Antikorps"])
                 };
 
                 var terms = triggerTerms.Select(t => t.Term).ToList();

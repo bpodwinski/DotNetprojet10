@@ -2,6 +2,7 @@
 using ReportService.Models;
 using System.Text;
 using System.Text.Json;
+using System.Text.RegularExpressions;
 
 namespace ReportService.Services
 {
@@ -141,7 +142,7 @@ namespace ReportService.Services
                                         }
                                     }
                                 }).ToArray()
-                            }
+                            },
                         },
                         filter = new
                         {
@@ -162,22 +163,72 @@ namespace ReportService.Services
             };
 
             var jsonContent = JsonSerializer.Serialize(requestBody);
+            Console.WriteLine($"Elasticsearch request body: {jsonContent}");
             var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
             var response = await httpClient.PostAsync(elasticsearchUrl, content);
+            if (!response.IsSuccessStatusCode)
+            {
+                var errorContent = await response.Content.ReadAsStringAsync();
+                Console.WriteLine($"Elasticsearch error response: {errorContent}");
+                throw new Exception($"Elasticsearch error: {errorContent}");
+            }
             response.EnsureSuccessStatusCode();
 
             var responseBody = await response.Content.ReadAsStringAsync();
             var searchResponse = JsonSerializer.Deserialize<ElasticsearchSearchResponse<MedicalNoteModel>>(responseBody);
 
             var results = new List<MedicalNoteModel>();
+
+            var negativeKeywords = new List<string>
+            {
+                "ne", "pas", "jamais", "rien", "aucun", "aucune", "nul", "nulle",
+                "sans", "ni", "plus", "aucun signe", "pas de signe", "aucune trace",
+                "pas de trace"
+            };
+
             if (searchResponse?.Hits?.HitList != null)
             {
                 foreach (var hit in searchResponse.Hits.HitList)
                 {
                     if (hit.Source != null)
                     {
+                        // Ajoute les déclencheurs surlignés
                         hit.Source.HighlightedTriggers = hit.Highlight?.GetValueOrDefault("note") ?? [];
+
+                        var validTriggers = new List<string>();
+
+                        foreach (var highlightedTrigger in hit.Source.HighlightedTriggers)
+                        {
+                            // Fusionner les balises <em> consécutives dans le texte pour éviter de découper les déclencheurs complexes
+                            var mergedTrigger = Regex.Replace(highlightedTrigger, @"</em>\s*<em>", " ");
+
+                            // Extraire les mots entre <em> et </em>
+                            var matches = Regex.Matches(mergedTrigger, @"<em>(.*?)</em>");
+                            var triggers = matches.Cast<Match>().Select(m => m.Groups[1].Value).ToList();
+
+                            foreach (var trigger in triggers)
+                            {
+                                // Vérifie la présence de mots négatifs dans le contexte
+                                Console.WriteLine($"Processing Highlighted Trigger: {highlightedTrigger}");
+                                Console.WriteLine($"Checking Trigger: {trigger} against negative keywords.");
+
+                                if (!negativeKeywords.Any(negative =>
+                                    Regex.IsMatch(highlightedTrigger, $@"\b{negative}\b\s*(de|du|des|d')?\s*<em>{Regex.Escape(trigger)}</em>", RegexOptions.IgnoreCase) || // Avant le déclencheur
+                                    Regex.IsMatch(highlightedTrigger, $@"<em>{Regex.Escape(trigger)}</em>\s*(de|du|des|d')?\s*\b{negative}\b", RegexOptions.IgnoreCase)))  // Après le déclencheur
+                                {
+                                    Console.WriteLine($"Validated Trigger: {trigger}");
+                                    validTriggers.Add(trigger);
+                                }
+                                else
+                                {
+                                    Console.WriteLine($"Excluded Trigger: {trigger} due to context in: {highlightedTrigger}");
+                                }
+                            }
+                        }
+
+                        // Met à jour les déclencheurs valides
+                        hit.Source.HighlightedTriggers = validTriggers.Distinct().ToList();
                         results.Add(hit.Source);
                     }
                 }
