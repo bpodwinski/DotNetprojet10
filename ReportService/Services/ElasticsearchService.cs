@@ -182,10 +182,23 @@ namespace ReportService.Services
 
             var negativeKeywords = new List<string>
             {
-                "ne", "pas", "jamais", "rien", "aucun", "aucune", "nul", "nulle",
+                "ne", "pas", "jamais", "rien", "aucun", "aucuns", "aucune", "aucunes", "nul", "nulle",
                 "sans", "ni", "plus", "aucun signe", "pas de signe", "aucune trace",
                 "pas de trace"
             };
+
+            var negativeContextPatterns = new List<string>
+            {
+                @"\banomalie(s)?\b",         // "anomalie" ou "anomalies"
+                @"\bproblème(s)?\b",         // "problème" ou "problèmes"
+                @"\bdysfonctionnement(s)?\b",// "dysfonctionnement" ou "dysfonctionnements"
+                @"\baltération(s)?\b",       // "altération" ou "altérations"
+                @"\bdégradation(s)?\b",      // "dégradation" ou "dégradations"
+                @"\birrégularité(s)?\b",     // "irrégularité" ou "irrégularités"
+                @"\bdéfaut(s)?\b",           // "défaut" ou "défauts"
+                @"\btrouble(s)?\b"           // "trouble" ou "troubles"
+            };
+
 
             if (searchResponse?.Hits?.HitList != null)
             {
@@ -209,13 +222,23 @@ namespace ReportService.Services
 
                             foreach (var trigger in triggers)
                             {
+                                if (trigger.Equals("normal", StringComparison.OrdinalIgnoreCase))
+                                {
+                                    Console.WriteLine($"Excluded Trigger: {trigger} (invalid match for 'anormal').");
+                                    continue;
+                                }
+
                                 // Vérifie la présence de mots négatifs dans le contexte
                                 Console.WriteLine($"Processing Highlighted Trigger: {highlightedTrigger}");
                                 Console.WriteLine($"Checking Trigger: {trigger} against negative keywords.");
 
                                 if (!negativeKeywords.Any(negative =>
                                     Regex.IsMatch(highlightedTrigger, $@"\b{negative}\b\s*(de|du|des|d')?\s*<em>{Regex.Escape(trigger)}</em>", RegexOptions.IgnoreCase) || // Avant le déclencheur
-                                    Regex.IsMatch(highlightedTrigger, $@"<em>{Regex.Escape(trigger)}</em>\s*(de|du|des|d')?\s*\b{negative}\b", RegexOptions.IgnoreCase)))  // Après le déclencheur
+                                    Regex.IsMatch(highlightedTrigger, $@"<em>{Regex.Escape(trigger)}</em>\s*(de|du|des|d')?\s*\b{negative}\b", RegexOptions.IgnoreCase) ||  // Après le déclencheur
+                                    negativeContextPatterns.Any(pattern =>
+                                        Regex.IsMatch(highlightedTrigger, $@"\b{negative}\b.*{pattern}.*<em>{Regex.Escape(trigger)}</em>", RegexOptions.IgnoreCase) || // Avant avec contexte
+                                        Regex.IsMatch(highlightedTrigger, $@"<em>{Regex.Escape(trigger)}</em>.*\b{negative}\b.*{pattern}", RegexOptions.IgnoreCase) // Après avec contexte
+                                    )))
                                 {
                                     Console.WriteLine($"Validated Trigger: {trigger}");
                                     validTriggers.Add(trigger);

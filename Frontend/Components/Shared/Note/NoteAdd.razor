@@ -20,11 +20,11 @@
     <div class="card-body">
         <EditForm Model="newNote" OnValidSubmit="HandleValidSubmit">
             <DataAnnotationsValidator />
-            <ValidationSummary />
 
             <div class="mb-3">
                 <label class="form-label">@Localizer["Note"]</label>
                 <InputTextArea @bind-Value="newNote.Note" class="form-control" />
+                <ValidationMessage For="@(() => newNote.Note)" />
             </div>
 
             <button type="submit" class="btn btn-primary">@Localizer["AddNote"]</button>
@@ -57,6 +57,7 @@
                 {
                     await OnNoteAdded.InvokeAsync();
                 }
+                newNote = new();
             }
             else
             {
@@ -83,6 +84,7 @@
         public int PatientId { get; set; }
 
         [Required]
+        [MaxLength(500, ErrorMessage = "The note cannot exceed 500 characters")]
         public string Note { get; set; } = string.Empty;
     }
 }

@@ -56,7 +56,7 @@ namespace NoteService.Controllers
         /// <response code="404">If no Notes are found for the specified Patient ID.</response>
         /// <response code="500">If an internal error occurs.</response>
         [HttpGet("patientid/{id}")]
-        //[Authorize(policy: "User")]
+        [Authorize(policy: "User")]
         [ProducesResponseType(typeof(List<NoteDTO>), 200)]
         [ProducesResponseType(404)]
         [ProducesResponseType(500)]
@@ -93,7 +93,7 @@ namespace NoteService.Controllers
         /// <response code="400">If the model is invalid</response>
         /// <response code="500">If an internal error occurs</response>
         [HttpPost]
-        [Authorize(policy: "Admin")]
+        //[Authorize(policy: "Admin")]
         [ProducesResponseType(typeof(NoteDTO), 201)]
         [ProducesResponseType(400)]
         [ProducesResponseType(500)]
