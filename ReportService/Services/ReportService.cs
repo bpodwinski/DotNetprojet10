@@ -1,4 +1,5 @@
-﻿using ReportService.DTOs;
+﻿using Humanizer;
+using ReportService.DTOs;
 using ReportService.Models;
 using ReportService.Repositories;
 
@@ -138,6 +139,9 @@ namespace ReportService.Services
         /// <summary>
         /// Determines the diabetes risk level based on age, sex, and trigger count.
         /// </summary>
+        /// <summary>
+        /// Determines the diabetes risk level based on age, sex, and trigger count.
+        /// </summary>
         private static string CalculateRiskLevel(int age, string gender, int triggerCount)
         {
             if (triggerCount == 0)
@@ -145,41 +149,45 @@ namespace ReportService.Services
                 return "None";
             }
 
-            if (triggerCount >= 2 && triggerCount <= 5 && age > 30)
+            if (age > 30)
             {
-                return "Borderline";
-            }
-
-            if (age < 30)
-            {
-                if (gender.Equals("Male", StringComparison.OrdinalIgnoreCase) && triggerCount >= 3)
+                if (triggerCount >= 2 && triggerCount <= 5)
+                {
+                    return "Borderline";
+                }
+                if (triggerCount == 6 || triggerCount == 7)
                 {
                     return "In Danger";
                 }
-                if (gender.Equals("Female", StringComparison.OrdinalIgnoreCase) && triggerCount >= 4)
-                {
-                    return "In Danger";
-                }
-            }
-            else if (age > 30 && (triggerCount == 6 || triggerCount == 7))
-            {
-                return "In Danger";
-            }
-
-            if (age < 30)
-            {
-                if (gender.Equals("Male", StringComparison.OrdinalIgnoreCase) && triggerCount >= 5)
-                {
-                    return "Early Onset";
-                }
-                if (gender.Equals("Female", StringComparison.OrdinalIgnoreCase) && triggerCount >= 7)
+                if (triggerCount >= 8)
                 {
                     return "Early Onset";
                 }
             }
-            else if (age > 30 && triggerCount >= 8)
+            else // age <= 30
             {
-                return "Early Onset";
+                if (gender.Equals("Male", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (triggerCount >= 5)
+                    {
+                        return "Early Onset";
+                    }
+                    if (triggerCount >= 3)
+                    {
+                        return "In Danger";
+                    }
+                }
+                else if (gender.Equals("Female", StringComparison.OrdinalIgnoreCase))
+                {
+                    if (triggerCount >= 7)
+                    {
+                        return "Early Onset";
+                    }
+                    if (triggerCount >= 4)
+                    {
+                        return "In Danger";
+                    }
+                }
             }
 
             return "None";

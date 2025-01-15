@@ -13,7 +13,7 @@
 
 <h2>@Localizer["Notes"]</h2>
 
-@if (notes != null && notes.Any())
+@if (notes.Any())
 {
     <div class="notes mb-4">
         @foreach (var note in notes)
@@ -23,7 +23,7 @@
 
                 <h5 class="card-header d-flex justify-content-between align-items-center">
                     @Localizer["NoteFrom"] @note.LocalDate
-                    <button class="btn btn-danger" @onclick="() => DeleteNoteAsync(note.Id)" data-bs-toggle="tooltip" data-bs-title="@Localizer[" Delete"]">
+                    <button class="btn btn-danger" @onclick="() => DeleteNoteAsync(note.Id)" data-bs-toggle="tooltip" data-bs-title="@Localizer["Delete"]">
                         <i class="bi bi-trash"></i>
                     </button>
                 </h5>
@@ -35,7 +35,7 @@
         }
     </div>
 }
-else if (isNotesLoading)
+else if (isLoading)
 {
     <Loading />
 }
@@ -53,21 +53,19 @@ else
     [Parameter]
     public int PatientId { get; set; }
 
-    private List<NoteModel>? notes = null;
-    private bool isNotesLoading = true;
-    private string statusMessage = string.Empty;
+    private List<NoteModel> notes = new List<NoteModel>();
+    private bool isLoading = true;
 
     protected override async Task OnParametersSetAsync()
     {
         await LoadPatientNotes();
-        StateHasChanged();
     }
 
     public async Task LoadPatientNotes()
     {
         try
         {
-            isNotesLoading = true;
+            isLoading = true;
             var response = await CustomHttpClient.GetAsync($"notes/patientid/{PatientId}");
 
             if (response.IsSuccessStatusCode)
@@ -76,9 +74,11 @@ else
                 notes = JsonSerializer.Deserialize<List<NoteModel>>(responseContent, new JsonSerializerOptions
                     {
                         PropertyNameCaseInsensitive = true
-                    });
-
-                notes ??= new List<NoteModel>();
+                    }) ?? new List<NoteModel>();
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+            {
+                notes = new List<NoteModel>();
             }
         }
         catch (Exception ex)
@@ -88,7 +88,7 @@ else
         }
         finally
         {
-            isNotesLoading = false;
+            isLoading = false;
             StateHasChanged();
         }
     }
@@ -97,13 +97,12 @@ else
     {
         try
         {
-            isNotesLoading = true;
+            isLoading = true;
             var response = await CustomHttpClient.DeleteAsync($"notes/{noteId}");
 
-            if (response.IsSuccessStatusCode)
+            if (response.IsSuccessStatusCode || notes == null || !notes.Any())
             {
                 await LoadPatientNotes();
-
                 Layout.ShowToast(Localizer["NoteDeletedSuccess"], Localizer["The note has been successfully deleted"], ToastSeverity.Success);
             }
             else
@@ -117,7 +116,7 @@ else
         }
         finally
         {
-            isNotesLoading = false;
+            isLoading = false;
             StateHasChanged();
         }
     }

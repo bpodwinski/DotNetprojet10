@@ -6,7 +6,9 @@
 @using Models
 @using Services
 @using Locales
+@using Layout
 
+@inject ILogger<PatientEdit> Logger
 @inject CustomHttpClient CustomHttpClient
 @inject IStringLocalizer<Resource> Localizer
 @inject NavigationManager NavigationManager
@@ -105,7 +107,7 @@
                     </div>
 
                     <div class="d-flex justify-content-between">
-                        <button type="button" class="btn btn-secondary" @onclick="GoBack">@Localizer["Cancel"]</button>
+                        <a class="btn btn-secondary" role="button" href="/patients">@Localizer["Cancel"]</a>
                         <button type="submit" class="btn btn-primary">@Localizer["Add"]</button>
                     </div>
                 </EditForm>
@@ -120,12 +122,14 @@
 }
 
 @code {
+    [CascadingParameter]
+    private MainLayout Layout { get; set; } = default!;
+
     private PatientModel newPatient = new PatientModel
         {
             DateOfBirth = DateTime.Today
         };
     private string statusMessage = string.Empty;
-    private string globalErrorMessage = string.Empty;
     private Dictionary<string, List<string>> fieldErrors = new();
     private DateTime MaxDate { get; set; } = DateTime.Today;
 
@@ -137,7 +141,7 @@
 
             if (response.IsSuccessStatusCode)
             {
-                statusMessage = Localizer["PatientAdded"];
+                Layout.ShowToast(Localizer["PatientAddedSuccess"], Localizer["The patient has been successfully added"], ToastSeverity.Success);
                 NavigationManager.NavigateTo("/patients");
             }
             else
@@ -146,7 +150,6 @@
 
                 if (errorResponse?.Errors != null)
                 {
-                    globalErrorMessage = string.Empty;
                     fieldErrors.Clear();
 
                     foreach (var error in errorResponse.Errors)
@@ -161,18 +164,14 @@
                 }
                 else
                 {
-                    globalErrorMessage = Localizer["ErrorAddingPatient"];
+                    Layout.ShowToast(Localizer["FailedAddingPatient"], Localizer["Failed to adding the patient"], ToastSeverity.Warning);
                 }
             }
         }
         catch (Exception ex)
         {
-            statusMessage = $"{Localizer["ErrorAddingPatient"]}: {ex.Message}";
+            Logger.LogError(ex, "An error occurred while adding the patient");
+            Layout.ShowToast(Localizer["ErrorAddingPatient"], Localizer["An unexpected error occurred. Please try again later."], ToastSeverity.Error);
         }
-    }
-
-    private void GoBack()
-    {
-        NavigationManager.NavigateTo("/patients");
     }
 }

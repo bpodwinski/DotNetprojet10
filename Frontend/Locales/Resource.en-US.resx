@@ -192,6 +192,9 @@
   <data name="NoteAddedSuccess" xml:space="preserve">
     <value>Note added</value>
   </data>
+  <data name="NoteDeletedSuccess" xml:space="preserve">
+    <value>The note has been successfully deleted</value>
+  </data>
   <data name="NoteFrom" xml:space="preserve">
     <value>Note from</value>
   </data>
@@ -201,11 +204,17 @@
   <data name="Password" xml:space="preserve">
     <value>Password</value>
   </data>
+  <data name="PatientAddedSuccess" xml:space="preserve">
+    <value>The patient has been successfully added</value>
+  </data>
   <data name="PatientDeletedSuccessDesc" xml:space="preserve">
     <value>The patient has been deleted successfully</value>
   </data>
   <data name="PatientDeletedSuccessTitle" xml:space="preserve">
     <value>Patient Deleted Successfully</value>
+  </data>
+  <data name="PatientEditedSuccess" xml:space="preserve">
+    <value>The patient has been successfully edited</value>
   </data>
   <data name="PatientInfos" xml:space="preserve">
     <value>Patient information</value>

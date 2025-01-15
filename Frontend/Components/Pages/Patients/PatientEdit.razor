@@ -6,7 +6,9 @@
 @using Models
 @using Services
 @using Locales
+@using Layout
 
+@inject ILogger<PatientEdit> Logger
 @inject CustomHttpClient CustomHttpClient
 @inject IStringLocalizer<Resource> Localizer
 @inject NavigationManager NavigationManager
@@ -29,42 +31,42 @@
         <div class="d-flex align-items-center justify-content-center">
             <div class="card" style="width: 640px;">
                 <div class="card-body">
-                    <EditForm Model="newPatient" OnValidSubmit="HandleValidSubmit">
+                    <EditForm Model="editPatient" OnValidSubmit="Submit">
                         <DataAnnotationsValidator />
                         <ValidationSummary />
 
                         <div class="mb-3">
                             <label class="form-label">@Localizer["FirstName"]</label>
-                            <InputText @bind-Value="newPatient.FirstName" class="form-control" />
+                            <InputText @bind-Value="editPatient.FirstName" class="form-control" />
                         </div>
                         <div class="mb-3">
                             <label class="form-label">@Localizer["LastName"]</label>
-                            <InputText @bind-Value="newPatient.LastName" class="form-control" />
+                            <InputText @bind-Value="editPatient.LastName" class="form-control" />
                         </div>
                         <div class="mb-3">
                             <label class="form-label">@Localizer["BirthDate"]</label>
-                            <InputDate @bind-Value="newPatient.DateOfBirth" class="form-control"
+                            <InputDate @bind-Value="editPatient.DateOfBirth" class="form-control"
                                        min="1900-01-01" max="@MaxDate.ToString("yyyy-MM-dd")" />
-                            <ValidationMessage For="() => newPatient.DateOfBirth" />
+                            <ValidationMessage For="() => editPatient.DateOfBirth" />
                         </div>
                         <div class="mb-3">
                             <label class="form-label">@Localizer["Gender"]</label>
-                            <InputSelect @bind-Value="newPatient.Gender" class="form-control">
+                            <InputSelect @bind-Value="editPatient.Gender" class="form-control">
                                 <option value="Male">@Localizer["Male"]</option>
                                 <option value="Female">@Localizer["Female"]</option>
                             </InputSelect>
                         </div>
                         <div class="mb-3">
                             <label class="form-label">@Localizer["Address"]</label>
-                            <InputText @bind-Value="newPatient.Address" class="form-control" />
+                            <InputText @bind-Value="editPatient.Address" class="form-control" />
                         </div>
                         <div class="mb-3">
                             <label class="form-label">@Localizer["Phone"]</label>
-                            <InputText @bind-Value="newPatient.PhoneNumber" class="form-control" />
-                            <ValidationMessage For="() => newPatient.PhoneNumber" />
+                            <InputText @bind-Value="editPatient.PhoneNumber" class="form-control" />
+                            <ValidationMessage For="() => editPatient.PhoneNumber" />
                         </div>
 
-                        <button type="button" class="btn btn-secondary" @onclick="GoBack">@Localizer["Cancel"]</button>
+                        <a class="btn btn-secondary" role="button" href="/patients">@Localizer["Cancel"]</a>
                         <button type="submit" class="btn btn-primary">@Localizer["Edit"]</button>
                     </EditForm>
                 </div>
@@ -79,10 +81,13 @@
 }
 
 @code {
+    [CascadingParameter]
+    private MainLayout Layout { get; set; } = default!;
+
     [Parameter]
     public int PatientId { get; set; }
 
-    private PatientModel newPatient = new();
+    private PatientModel editPatient = new();
     private string statusMessage = string.Empty;
     private bool isLoading = true;
     private bool hasError = false;
@@ -91,6 +96,7 @@
     protected override async Task OnInitializedAsync()
     {
         await LoadPatientData();
+        StateHasChanged();
     }
 
     private async Task LoadPatientData()
@@ -104,7 +110,7 @@
             if (response.IsSuccessStatusCode)
             {
                 var responseContent = await response.Content.ReadAsStringAsync();
-                newPatient = JsonSerializer.Deserialize<PatientModel>(responseContent, new JsonSerializerOptions
+                editPatient = JsonSerializer.Deserialize<PatientModel>(responseContent, new JsonSerializerOptions
                     {
                         PropertyNameCaseInsensitive = true
                     }) ?? new PatientModel();
@@ -123,32 +129,29 @@
         finally
         {
             isLoading = false;
+            StateHasChanged();
         }
     }
 
-    private async Task HandleValidSubmit()
+    private async Task Submit()
     {
         try
         {
-            var response = await CustomHttpClient.PutAsync($"patients/{PatientId}", newPatient);
+            var response = await CustomHttpClient.PutAsync($"patients/{PatientId}", editPatient);
             if (response.IsSuccessStatusCode)
             {
-                statusMessage = Localizer["PatientEdited"];
+                Layout.ShowToast(Localizer["PatientEditedSuccess"], Localizer["The patient has been successfully edited"], ToastSeverity.Success);
                 NavigationManager.NavigateTo("/patients");
             }
             else
             {
-                statusMessage = Localizer["ErrorEditingPatient"];
+                Layout.ShowToast(Localizer["FailedEditingPatient"], Localizer["Failed to editing the patient"], ToastSeverity.Warning);
             }
         }
         catch (Exception ex)
         {
-            statusMessage = $"{Localizer["ErrorEditingPatient"]}: {ex.Message}";
+            Logger.LogError(ex, "An error occurred while editing the patient {PatientId}", PatientId);
+            Layout.ShowToast(Localizer["ErrorEditingPatient"], Localizer["An unexpected error occurred. Please try again later."], ToastSeverity.Error);
         }
-    }
-
-    private void GoBack()
-    {
-        NavigationManager.NavigateTo("/patients");
     }
 }
