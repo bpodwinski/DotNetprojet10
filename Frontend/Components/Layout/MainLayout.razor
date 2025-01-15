@@ -1,5 +1,6 @@
 ﻿@inherits LayoutComponentBase
 
+@using Models
 @using Frontend.Components.Shared.Toasts
 
 <CascadingValue Value="this">
@@ -33,8 +34,8 @@
 @code {
     private Toast? toastContainer;
 
-    public void ShowToast(string title, string message)
+    public void ShowToast(string title, string message, ToastSeverity severity)
     {
-        toastContainer?.AddToast(title, message);
+        toastContainer?.AddToast(title, message, severity);
     }
 }

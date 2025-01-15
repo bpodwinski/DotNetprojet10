@@ -1,18 +1,29 @@
-﻿@using Toasts
+﻿@using Models
+@using Toasts
 
 <div class="toast-container position-fixed bottom-0 end-0 p-3">
     @foreach (var toast in Toasts)
     {
-        <ToastParts ToastId="@toast.Id" Title="@toast.Title" Message="@toast.Message" OnToastClosed="() => RemoveToast(toast)" />
+        <ToastParts
+            ToastId="@toast.Id"
+            Title="@toast.Title"
+            Message="@toast.Message"
+            Severity="@toast.Severity"
+            OnToastClosed="() => RemoveToast(toast)" />
     }
 </div>
 
 @code {
     private List<ToastModel> Toasts { get; set; } = new();
 
-    public void AddToast(string title, string message)
+    public void AddToast(string title, string message, ToastSeverity severity)
     {
-        Toasts.Add(new ToastModel { Id = $"toast-{Guid.NewGuid()}", Title = title, Message = message });
+        Toasts.Add(new ToastModel { 
+            Id = $"toast-{Guid.NewGuid()}",
+            Title = title,
+            Message = message,
+            Severity = severity
+        });
         StateHasChanged();
     }
 
@@ -20,12 +31,5 @@
     {
         Toasts.Remove(toast);
         StateHasChanged();
-    }
-
-    private class ToastModel
-    {
-        public string Id { get; set; } = string.Empty;
-        public string Title { get; set; } = string.Empty;
-        public string Message { get; set; } = string.Empty;
     }
 }

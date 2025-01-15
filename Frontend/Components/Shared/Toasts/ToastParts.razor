@@ -1,10 +1,13 @@
-﻿<div id="@ToastId" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
-    <div class="toast-header">
-        <strong class="me-auto">@Title</strong>
-        <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close" @onclick="CloseToast"></button>
-    </div>
-    <div class="toast-body">
-        @Message
+﻿@using Models
+
+@inject ILogger<ToastParts> Logger
+
+<div id="@ToastId" class="toast align-items-center @ToastColor border-0" role="alert" aria-live="assertive" aria-atomic="true">
+    <div class="d-flex">
+        <div class="toast-body">
+            @Title
+        </div>
+        <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
     </div>
 </div>
 
@@ -17,6 +20,9 @@
 
     [Parameter]
     public string Message { get; set; } = string.Empty;
+
+    [Parameter]
+    public ToastSeverity Severity { get; set; }
 
     [Parameter]
     public EventCallback OnToastClosed { get; set; }
@@ -32,6 +38,14 @@
         }
     }
 
+    private string ToastColor => Severity switch
+    {
+        ToastSeverity.Success => "text-bg-success",
+        ToastSeverity.Warning => "text-bg-warning",
+        ToastSeverity.Error => "text-bg-danger",
+        _ => "text-bg-primary"
+    };
+
     public async Task ShowToast()
     {
         try
@@ -44,26 +58,7 @@
         }
         catch (Exception ex)
         {
-            Console.WriteLine($"[Toast Component] Error showing toast: {ex.Message}");
+            Logger.LogError(ex, "Error showing toast with ID {ToastId}", ToastId);
         }
-    }
-
-    public async Task HideToast()
-    {
-        try
-        {
-            var toastInstance = await JSRuntime.InvokeAsync<IJSObjectReference>("bootstrap.Toast.getOrCreateInstance", $"#{ToastId}");
-            await toastInstance.InvokeVoidAsync("hide");
-            await OnToastClosed.InvokeAsync();
-        }
-        catch (Exception ex)
-        {
-            Console.WriteLine($"[Toast Component] Error hiding toast: {ex.Message}");
-        }
-    }
-
-    private async Task CloseToast()
-    {
-        await HideToast();
     }
 }

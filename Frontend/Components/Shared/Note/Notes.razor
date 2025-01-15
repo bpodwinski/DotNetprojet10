@@ -104,16 +104,16 @@ else
             {
                 await LoadPatientNotes();
 
-                Layout.ShowToast(Localizer["NoteDeletedSuccess"], Localizer["The note has been successfully deleted"]);
+                Layout.ShowToast(Localizer["NoteDeletedSuccess"], Localizer["The note has been successfully deleted"], ToastSeverity.Success);
             }
             else
             {
-                Layout.ShowToast(Localizer["NoteDeletedFailed"], Localizer["Failed to delete the note."]);
+                Layout.ShowToast(Localizer["NoteDeletedFailed"], Localizer["Failed to delete the note."], ToastSeverity.Warning);
             }
         }
         catch (Exception ex)
         {
-            Layout.ShowToast(Localizer["ErrorDeletingNote"], $"Error: {ex.Message}");
+            Layout.ShowToast(Localizer["ErrorDeletingNote"], $"Error: {ex.Message}", ToastSeverity.Error);
         }
         finally
         {

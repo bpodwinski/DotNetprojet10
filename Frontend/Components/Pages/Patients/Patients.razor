@@ -100,16 +100,16 @@
             if (response.IsSuccessStatusCode)
             {
                 patients = patients.Where(p => p.Id != id).ToList();
-                Layout.ShowToast(Localizer["PatientDeletedSuccessTitle"], Localizer["PatientDeletedSuccessDesc"]);
+                Layout.ShowToast(Localizer["PatientDeletedSuccessTitle"], Localizer["PatientDeletedSuccessDesc"], ToastSeverity.Success);
             }
             else
             {
-                Layout.ShowToast(Localizer["PatientDeletedFailedTitle"], Localizer["PatientDeletedFailedDesc"]);
+                Layout.ShowToast(Localizer["PatientDeletedFailedTitle"], Localizer["PatientDeletedFailedDesc"], ToastSeverity.Warning);
             }
         }
         catch (Exception ex)
         {
-            Layout.ShowToast(Localizer["PatientDeletedError"], ex.Message);
+            Layout.ShowToast(Localizer["PatientDeletedError"], ex.Message, ToastSeverity.Error);
         }
     }
 }
