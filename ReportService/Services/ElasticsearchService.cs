@@ -25,6 +25,19 @@ namespace ReportService.Services
             _client = new ElasticsearchClient(settings);
         }
 
+        private static readonly List<string> NegativeKeywords =
+        [
+            "ne", "pas", "jamais", "rien", "aucun", "aucuns", "aucune", "aucunes", "nul", "nulle",
+            "sans", "ni", "plus", "aucun signe", "pas de signe", "aucune trace", "pas de trace"
+        ];
+
+        private static readonly List<string> NegativeContextPatterns =
+        [
+            @"\banomalie(s)?\b", @"\bproblème(s)?\b", @"\bdysfonctionnement(s)?\b",
+            @"\baltération(s)?\b", @"\bdégradation(s)?\b", @"\birrégularité(s)?\b",
+            @"\bdéfaut(s)?\b", @"\btrouble(s)?\b"
+        ];
+
         /// <summary>
         /// Checks if the specified index exists in Elasticsearch and creates it if it does not exist.
         /// </summary>
@@ -180,77 +193,43 @@ namespace ReportService.Services
 
             var results = new List<MedicalNoteModel>();
 
-            var negativeKeywords = new List<string>
-            {
-                "ne", "pas", "jamais", "rien", "aucun", "aucuns", "aucune", "aucunes", "nul", "nulle",
-                "sans", "ni", "plus", "aucun signe", "pas de signe", "aucune trace",
-                "pas de trace"
-            };
-
-            var negativeContextPatterns = new List<string>
-            {
-                @"\banomalie(s)?\b",         // "anomalie" ou "anomalies"
-                @"\bproblème(s)?\b",         // "problème" ou "problèmes"
-                @"\bdysfonctionnement(s)?\b",// "dysfonctionnement" ou "dysfonctionnements"
-                @"\baltération(s)?\b",       // "altération" ou "altérations"
-                @"\bdégradation(s)?\b",      // "dégradation" ou "dégradations"
-                @"\birrégularité(s)?\b",     // "irrégularité" ou "irrégularités"
-                @"\bdéfaut(s)?\b",           // "défaut" ou "défauts"
-                @"\btrouble(s)?\b"           // "trouble" ou "troubles"
-            };
-
-
             if (searchResponse?.Hits?.HitList != null)
             {
                 foreach (var hit in searchResponse.Hits.HitList)
                 {
                     if (hit.Source != null)
                     {
-                        // Ajoute les déclencheurs surlignés
+                        // Extract highlighted triggers or initialize an empty list
                         hit.Source.HighlightedTriggers = hit.Highlight?.GetValueOrDefault("note") ?? [];
 
                         var validTriggers = new List<string>();
 
                         foreach (var highlightedTrigger in hit.Source.HighlightedTriggers)
                         {
-                            // Fusionner les balises <em> consécutives dans le texte pour éviter de découper les déclencheurs complexes
+                            // Merge consecutive <em> tags to avoid splitting complex triggers
                             var mergedTrigger = Regex.Replace(highlightedTrigger, @"</em>\s*<em>", " ");
 
-                            // Extraire les mots entre <em> et </em>
+                            // Extract triggers between <em> tags
                             var matches = Regex.Matches(mergedTrigger, @"<em>(.*?)</em>");
                             var triggers = matches.Cast<Match>().Select(m => m.Groups[1].Value).ToList();
 
                             foreach (var trigger in triggers)
                             {
+                                // Skip invalid match
                                 if (trigger.Equals("normal", StringComparison.OrdinalIgnoreCase))
                                 {
-                                    Console.WriteLine($"Excluded Trigger: {trigger} (invalid match for 'anormal').");
                                     continue;
                                 }
 
-                                // Vérifie la présence de mots négatifs dans le contexte
-                                Console.WriteLine($"Processing Highlighted Trigger: {highlightedTrigger}");
-                                Console.WriteLine($"Checking Trigger: {trigger} against negative keywords.");
-
-                                if (!negativeKeywords.Any(negative =>
-                                    Regex.IsMatch(highlightedTrigger, $@"\b{negative}\b\s*(de|du|des|d')?\s*<em>{Regex.Escape(trigger)}</em>", RegexOptions.IgnoreCase) || // Avant le déclencheur
-                                    Regex.IsMatch(highlightedTrigger, $@"<em>{Regex.Escape(trigger)}</em>\s*(de|du|des|d')?\s*\b{negative}\b", RegexOptions.IgnoreCase) ||  // Après le déclencheur
-                                    negativeContextPatterns.Any(pattern =>
-                                        Regex.IsMatch(highlightedTrigger, $@"\b{negative}\b.*{pattern}.*<em>{Regex.Escape(trigger)}</em>", RegexOptions.IgnoreCase) || // Avant avec contexte
-                                        Regex.IsMatch(highlightedTrigger, $@"<em>{Regex.Escape(trigger)}</em>.*\b{negative}\b.*{pattern}", RegexOptions.IgnoreCase) // Après avec contexte
-                                    )))
+                                // Add valid trigger
+                                if (!IsTriggerExcluded(highlightedTrigger, trigger))
                                 {
-                                    Console.WriteLine($"Validated Trigger: {trigger}");
                                     validTriggers.Add(trigger);
-                                }
-                                else
-                                {
-                                    Console.WriteLine($"Excluded Trigger: {trigger} due to context in: {highlightedTrigger}");
                                 }
                             }
                         }
 
-                        // Met à jour les déclencheurs valides
+                        // Update valid triggers and add to results
                         hit.Source.HighlightedTriggers = validTriggers.Distinct().ToList();
                         results.Add(hit.Source);
                     }
@@ -258,6 +237,40 @@ namespace ReportService.Services
             }
 
             return results;
+        }
+
+        /// <summary>
+        /// Determines if a given trigger should be excluded based on its context in the highlighted text.
+        /// </summary>
+        /// <param name="highlightedTrigger">The highlighted text containing the trigger and its surrounding context.</param>
+        /// <param name="trigger">The specific trigger word or phrase to evaluate.</param>
+        /// <returns>
+        /// True if the trigger is excluded due to the presence of negative keywords or contextual patterns; otherwise, false.
+        /// </returns>
+        /// <remarks>
+        /// This method evaluates whether a trigger is negated or invalid within its surrounding context in the highlighted text.
+        /// It checks for:
+        /// - Negative keywords (e.g., "no", "not", "never") directly preceding or following the trigger.
+        /// - Contextual patterns (e.g., "anomalies", "problems") that suggest negation when combined with negative keywords.
+        /// The method supports singular and plural forms of context patterns and handles French-specific phrases with
+        /// optional articles such as "de", "du", "des", and "d'".
+        /// </remarks>
+        private static bool IsTriggerExcluded(string highlightedTrigger, string trigger)
+        {
+            return NegativeKeywords.Any(negative =>
+                // Negative keyword before the trigger
+                Regex.IsMatch(highlightedTrigger, $@"\b{negative}\b\s*(de|du|des|d')?\s*<em>{Regex.Escape(trigger)}</em>", RegexOptions.IgnoreCase) ||
+
+                // Negative keyword after the trigger
+                Regex.IsMatch(highlightedTrigger, $@"<em>{Regex.Escape(trigger)}</em>\s*(de|du|des|d')?\s*\b{negative}\b", RegexOptions.IgnoreCase) ||
+
+                // Negative keyword and contextual pattern before the trigger
+                NegativeContextPatterns.Any(pattern =>
+                    Regex.IsMatch(highlightedTrigger, $@"\b{negative}\b.*{pattern}.*<em>{Regex.Escape(trigger)}</em>", RegexOptions.IgnoreCase) ||
+
+                    // Negative keyword and contextual pattern after the trigger
+                    Regex.IsMatch(highlightedTrigger, $@"<em>{Regex.Escape(trigger)}</em>.*\b{negative}\b.*{pattern}", RegexOptions.IgnoreCase)
+                ));
         }
     }
 }

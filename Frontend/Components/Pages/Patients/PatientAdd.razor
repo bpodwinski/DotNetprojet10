@@ -20,7 +20,7 @@
     <div class="d-flex align-items-center justify-content-center">
         <div class="card" style="width: 640px;">
             <div class="card-body">
-                <EditForm Model="newPatient" OnValidSubmit="HandleValidSubmit">
+                <EditForm Model="newPatient" OnValidSubmit="Submit">
                     <DataAnnotationsValidator />
 
                     <div class="mb-3">
@@ -130,7 +130,7 @@
     private Dictionary<string, List<string>> fieldErrors = new();
     private DateTime MaxDate { get; set; } = DateTime.Today;
 
-    private async Task HandleValidSubmit()
+    private async Task Submit()
     {
         try
         {
