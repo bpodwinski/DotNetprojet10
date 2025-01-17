@@ -28,19 +28,20 @@
         <div class="col-lg-6">
             <section>
                 <StatusMessage Message="@errorMessage" />
-                <EditForm Model="Input" method="post" OnValidSubmit="LoginUser" FormName="login">
+                <EditForm EditContext="@editContext" method="post" OnValidSubmit="LoginUser">
                     <DataAnnotationsValidator />
                     <ValidationSummary class="text-danger" role="alert" />
+
                     <div class="form-floating mb-3">
                         <InputText @bind-Value="Input.UserName" id="Input.UserName" class="form-control" autocomplete="username" aria-required="true" placeholder="@Localizer["Username"]" />
                         <label for="Input.UserName" class="form-label">@Localizer["Username"]</label>
-                        <ValidationMessage For="() => Input.UserName" class="text-danger" />
                     </div>
+
                     <div class="form-floating mb-3">
                         <InputText type="password" @bind-Value="Input.Password" id="Input.Password" class="form-control" autocomplete="current-password" aria-required="true" placeholder="@Localizer["Password"]" />
                         <label for="Input.Password" class="form-label">@Localizer["Password"]</label>
-                        <ValidationMessage For="() => Input.Password" class="text-danger" />
                     </div>
+
                     <div>
                         <button type="submit" class="w-100 btn btn-lg btn-primary">@Localizer["Login"]</button>
                     </div>
@@ -54,6 +55,8 @@
     private string? errorMessage;
     private bool isAuthenticated;
     private bool isRedirectionPending = false;
+    private EditContext editContext;
+    private ValidationMessageStore messageStore;
 
     [CascadingParameter]
     private HttpContext HttpContext { get; set; } = default!;
@@ -66,6 +69,14 @@
 
     protected override async Task OnInitializedAsync()
     {
+        editContext = new EditContext(Input);
+        editContext.OnFieldChanged += (sender, args) =>
+        {
+            messageStore.Clear(args.FieldIdentifier);
+        };
+
+        messageStore = new ValidationMessageStore(editContext);
+
         var authState = await AuthStateProvider.GetAuthenticationStateAsync();
         isAuthenticated = authState.User.Identity?.IsAuthenticated ?? false;
 
@@ -88,6 +99,8 @@
     {
         try
         {
+            messageStore.Clear();
+
             var loginData = new
             {
                 username = Input.UserName,
@@ -108,24 +121,41 @@
                 {
                     await AuthStateProvider.NotifyUserAuthenticationAsync(loginResponse.Token);
 
-                    Logger.LogInformation("User logged in.");
+                    Logger.LogInformation("User logged in");
 
                     NavigationManager.NavigateTo("patients", true);
                 }
                 else
                 {
-                    errorMessage = Localizer["ErrorUnableToRetrieveToken"];
+                    messageStore.Add(editContext.Field(nameof(Input.UserName)), "Username is required.");
+                    messageStore.Add(editContext.Field(nameof(Input.Password)), "Password is invalid.");
+                    editContext.NotifyValidationStateChanged();
                 }
+            }
+            else if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
+            {
+                var responseContent = await response.Content.ReadAsStringAsync();
+                var errorDetails = JsonSerializer.Deserialize<ErrorDetails>(responseContent, new JsonSerializerOptions
+                    {
+                        PropertyNameCaseInsensitive = true
+                    });
+
+                messageStore.Add(editContext.Field(nameof(Input.UserName)), "Username is required.");
+                messageStore.Add(editContext.Field(nameof(Input.Password)), "Password is invalid.");
+                editContext.NotifyValidationStateChanged();
             }
             else
             {
-                errorMessage = Localizer["ErrorInvalidLogin"];
+                messageStore.Add(editContext.Field(nameof(Input.Password)), Localizer["ErrorGenericLogin"]);
+                editContext.NotifyValidationStateChanged();
             }
         }
         catch (Exception ex)
         {
             Logger.LogError(ex, "Error during login process.");
-            errorMessage = Localizer["ErrorGenericLogin"];
+            messageStore.Add(editContext.Field(nameof(Input.UserName)), "Username is required.");
+            messageStore.Add(editContext.Field(nameof(Input.Password)), "Password is invalid.");
+            editContext.NotifyValidationStateChanged();
         }
     }
 
@@ -144,5 +174,10 @@
         public string Token { get; set; } = "";
         public string RefreshToken { get; set; } = "";
         public int UserId { get; set; }
+    }
+
+    private class ErrorDetails
+    {
+        public string Message { get; set; } = "";
     }
 }
