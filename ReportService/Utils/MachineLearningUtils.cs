@@ -126,7 +126,7 @@ namespace ReportService.Utils
         /// <summary>
         /// Checks if a trigger is negated by a nearby negation phrase.
         /// </summary>
-        private static bool IsNegated(string notesLower, string trigger, string[] negations)
+        private static bool IsNegated(string notesLower, string trigger, Span<string> negations)
         {
             foreach (var negation in negations)
             {
