@@ -38,6 +38,32 @@ namespace ReportService.Services
             @"\bdéfaut(s)?\b", @"\btrouble(s)?\b"
         ];
 
+        private async Task WaitForElasticsearchAsync()
+        {
+            var maxRetries = 10;
+            var delay = TimeSpan.FromSeconds(5);
+
+            for (int i = 0; i < maxRetries; i++)
+            {
+                try
+                {
+                    var pingResponse = await _client.PingAsync();
+                    if (pingResponse.IsValidResponse)
+                    {
+                        Console.WriteLine("Elasticsearch is ready!");
+                        return;
+                    }
+                }
+                catch (Exception)
+                {
+                    Console.WriteLine($"Elasticsearch not ready. Retrying in {delay.TotalSeconds} seconds...");
+                    await Task.Delay(delay);
+                }
+            }
+
+            throw new Exception("Elasticsearch is not available after multiple retries.");
+        }
+
         /// <summary>
         /// Checks if the specified index exists in Elasticsearch and creates it if it does not exist.
         /// </summary>
@@ -45,6 +71,9 @@ namespace ReportService.Services
         /// <returns>True if the index was created or already exists, otherwise false.</returns>
         public async Task<bool> CreateIndexAsync(string indexName)
         {
+            // Wait Elasticsearch is ready
+            await WaitForElasticsearchAsync();
+
             var response = await _client.Indices.ExistsAsync(indexName);
 
             if (!response.Exists)

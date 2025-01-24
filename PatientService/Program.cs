@@ -177,6 +177,21 @@ app.UseSerilogRequestLogging();
 app.UseAuthentication();
 app.UseAuthorization();
 
+// Apply migrations at runtime
+using (var scope = app.Services.CreateScope())
+{
+    var dbContext = scope.ServiceProvider.GetRequiredService<LocalDbContext>();
+    try
+    {
+        dbContext.WaitForDatabaseAsync(dbContext).GetAwaiter().GetResult();
+        dbContext.Database.Migrate();
+    }
+    catch (Exception ex)
+    {
+        Console.WriteLine($"Error applying migrations: {ex.Message}");
+    }
+}
+
 app.UseHttpsRedirection();
 app.MapControllers();
 app.Run();

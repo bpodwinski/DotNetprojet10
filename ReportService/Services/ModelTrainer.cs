@@ -70,7 +70,7 @@ namespace ReportService.Services
                         {
                             LabelColumnName = "Label",
                             FeatureColumnName = "Features",
-                            MaximumNumberOfIterations = 10000,
+                            MaximumNumberOfIterations = 100,
                             ConvergenceTolerance = 1e-4F,
                             BiasLearningRate = 0.01f
                         }));
