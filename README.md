@@ -19,7 +19,7 @@ Diagramme représentant l'architecture de l'application :
 Docker : https://www.docker.com/
 
 ## Installation
-Installer Docker.
+Installer Docker
 
 1. Cloner le projet 
 	```
@@ -29,3 +29,12 @@ Installer Docker.
 	```
 	docker compose up
 	```
+## Utilisation
+
+Pour accéder à l'application : [http://localhost:8080/](http://localhost:8080/)
+
+Un compte **Super Admin** est créé par défaut pour vous connecter :
+- **Identifiant** : `admin`
+- **Mot de passe** : `Ls7N0U7tmZ48!`
+
+Quatre patients sont déjà créés, chacun avec une note et un niveau de rapport différent. À vous de tester l'application et d'explorer ses fonctionnalités !
