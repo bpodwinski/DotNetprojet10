@@ -26,5 +26,7 @@ RUN dotnet publish "./GatewayService.csproj" -c $BUILD_CONFIGURATION -o /app/pub
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+USER root
 RUN mkdir -p /app/tmp && chmod -R 777 /app/tmp
+USER $APP_UID
 ENTRYPOINT ["dotnet", "GatewayService.dll"]
