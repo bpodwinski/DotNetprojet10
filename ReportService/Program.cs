@@ -145,26 +145,25 @@ builder.Services.AddScoped<IElasticsearchService>(provider => new ElasticsearchS
 
 
 // Configure DI for IModelTrainer
-builder.Services.AddScoped<IModelTrainer>(sp =>
-{
-    var configuration = sp.GetRequiredService<IConfiguration>();
-    var logger = sp.GetRequiredService<ILogger<ModelTrainer>>();
-    return new ModelTrainer(configuration, logger);
-});
+//builder.Services.AddScoped<IModelTrainer>(sp =>
+//{
+//    var configuration = sp.GetRequiredService<IConfiguration>();
+//    var logger = sp.GetRequiredService<ILogger<ModelTrainer>>();
+//    return new ModelTrainer(configuration, logger);
+//});
 
 // Configure DI for IMachineLearningService
-builder.Services.AddScoped<IMachineLearningService>(sp =>
-{
-    var configuration = sp.GetRequiredService<IConfiguration>();
-    var logger = sp.GetRequiredService<ILogger<MachineLearningService>>();
-    var modelTrainer = sp.GetRequiredService<IModelTrainer>();
-    return new MachineLearningService(modelTrainer, configuration, logger);
-});
+//builder.Services.AddScoped<IMachineLearningService>(sp =>
+//{
+//    var configuration = sp.GetRequiredService<IConfiguration>();
+//    var logger = sp.GetRequiredService<ILogger<MachineLearningService>>();
+//    var modelTrainer = sp.GetRequiredService<IModelTrainer>();
+//    return new MachineLearningService(modelTrainer, configuration, logger);
+//});
 
-builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
+//builder.Services.AddSingleton<IConfiguration>(builder.Configuration);
 
-// Modifier l'enregistrement de ModelInitializer
-builder.Services.AddScoped<ModelInitializer>();
+//builder.Services.AddScoped<ModelInitializer>();
 
 builder.Services.AddHttpClient();
 builder.Services.AddHttpContextAccessor();
@@ -175,13 +174,12 @@ var app = builder.Build();
 app.UseSerilogRequestLogging();
 
 // Initialize ML.NET model
-using (var scope = app.Services.CreateScope())
-{
-    var modelInitializer = scope.ServiceProvider.GetRequiredService<ModelInitializer>();
-    modelInitializer.Initialize();
-}
+//using (var scope = app.Services.CreateScope())
+//{
+//    var modelInitializer = scope.ServiceProvider.GetRequiredService<ModelInitializer>();
+//    modelInitializer.Initialize();
+//}
 
-// Ajouter les déclencheurs dans Elasticsearch au démarrage
 using (var scope = app.Services.CreateScope())
 {
     var elasticsearchService = scope.ServiceProvider.GetRequiredService<IElasticsearchService>();

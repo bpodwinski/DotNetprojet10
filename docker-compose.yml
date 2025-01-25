@@ -95,6 +95,9 @@ services:
   frontend:
     image: ${DOCKER_REGISTRY-}frontend
     container_name: ocp10_frontend
+    ports:
+      - "8080:8080"
+      - "8081:8081"
     build:
       context: .
       dockerfile: Frontend/Dockerfile

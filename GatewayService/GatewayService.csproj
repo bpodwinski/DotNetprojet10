@@ -15,4 +15,8 @@
     <PackageReference Include="Ocelot" Version="23.4.2" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="tmp\" />
+  </ItemGroup>
+
 </Project>

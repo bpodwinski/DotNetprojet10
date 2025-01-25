@@ -11,10 +11,10 @@ EXPOSE 5000
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["GatewayService.csproj", "."]
-RUN dotnet restore "./GatewayService.csproj"
+COPY ["GatewayService/GatewayService.csproj", "GatewayService/"]
+RUN dotnet restore "./GatewayService/GatewayService.csproj"
 COPY . .
-WORKDIR "/src/."
+WORKDIR "/src/GatewayService"
 RUN dotnet build "./GatewayService.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
@@ -26,4 +26,5 @@ RUN dotnet publish "./GatewayService.csproj" -c $BUILD_CONFIGURATION -o /app/pub
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
+RUN mkdir -p /app/tmp && chmod -R 777 /app/tmp
 ENTRYPOINT ["dotnet", "GatewayService.dll"]

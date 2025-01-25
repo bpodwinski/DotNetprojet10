@@ -12,10 +12,10 @@ EXPOSE 8081
 FROM mcr.microsoft.com/dotnet/sdk:9.0 AS build
 ARG BUILD_CONFIGURATION=Release
 WORKDIR /src
-COPY ["NoteService.csproj", "."]
-RUN dotnet restore "./NoteService.csproj"
+COPY ["NoteService/NoteService.csproj", "NoteService/"]
+RUN dotnet restore "./NoteService/NoteService.csproj"
 COPY . .
-WORKDIR "/src/."
+WORKDIR "/src/NoteService"
 RUN dotnet build "./NoteService.csproj" -c $BUILD_CONFIGURATION -o /app/build
 
 # This stage is used to publish the service project to be copied to the final stage
