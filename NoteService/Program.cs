@@ -8,6 +8,7 @@ using Serilog;
 using System.Reflection;
 using System.Text;
 using NoteService.Data;
+using MongoDB.Driver;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -150,6 +151,13 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    var mongoContext = scope.ServiceProvider.GetRequiredService<MongoDbContext>();
+    var logger = scope.ServiceProvider.GetRequiredService<ILogger<Program>>();
+    await MongoSeeder.SeedNotesAsync(mongoContext, logger);
 }
 
 app.UseHttpsRedirection();
