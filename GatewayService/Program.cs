@@ -33,7 +33,7 @@ var ocelotConfig = new JObject
     }
 };
 
-var ocelotTempConfigPath = Path.Combine("/app/tmp", "ocelot.generated.json");
+var ocelotTempConfigPath = Path.Combine("tmp", "ocelot.generated.json");
 File.WriteAllText(ocelotTempConfigPath, ocelotConfig.ToString());
 
 builder.Configuration.AddJsonFile(ocelotTempConfigPath, optional: false, reloadOnChange: true);
