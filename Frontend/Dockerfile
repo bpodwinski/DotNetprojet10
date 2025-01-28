@@ -2,7 +2,7 @@
 
 # This stage is used when running from VS in fast mode (Default for Debug configuration)
 FROM mcr.microsoft.com/dotnet/aspnet:9.0 AS base
-#RUN mkdir /keys && chown $APP_UID /keys && chmod 700 /keys
+RUN mkdir /keys && chown $APP_UID /keys && chmod 700 /keys
 USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
@@ -28,5 +28,5 @@ RUN dotnet publish "./Frontend.csproj" -c $BUILD_CONFIGURATION -o /app/publish /
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-#VOLUME ["/keys"]
+VOLUME ["/keys"]
 ENTRYPOINT ["dotnet", "Frontend.dll"]

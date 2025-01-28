@@ -53,7 +53,7 @@ builder.Services.AddHttpClient<CustomHttpClient>(client =>
 });
 
 // Configure Data Protection to persist keys securely
-var keysDirectory = "/home/app/.aspnet/DataProtection-Keys";
+var keysDirectory = "/keys";
 if (!Directory.Exists(keysDirectory))
 {
     throw new Exception($"The directory '{keysDirectory}' does not exist or is not accessible");
