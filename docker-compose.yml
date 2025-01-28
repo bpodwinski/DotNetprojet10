@@ -102,7 +102,7 @@ services:
       context: .
       dockerfile: Frontend/Dockerfile
     volumes:
-      - keys:/keys
+      - frontend-keys:/home/app/.aspnet/DataProtection-Keys
     networks:
       - ocp10_network
 
@@ -118,6 +118,8 @@ services:
       JWT_SECRET_KEY: ${JWT_SECRET_KEY}
       JWT_ISSUER: ${JWT_ISSUER}
       JWT_AUDIENCE: ${JWT_AUDIENCE}
+    volumes:
+      - authservice-keys:/home/app/.aspnet/DataProtection-Keys
     depends_on:
       - authdb
     networks:
@@ -182,7 +184,8 @@ volumes:
   authdb:
   patientdb:
   notedb:
-  keys:
+  frontend-keys:
+  authservice-keys:
   es_data:
   
 networks:

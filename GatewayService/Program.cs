@@ -8,6 +8,17 @@ using System.Text;
 
 var builder = WebApplication.CreateBuilder(args);
 
+var environment = builder.Environment.EnvironmentName;
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+    .AddJsonFile($"appsettings{environment}.json", optional: true);
+
+//  Load .env file if environment is not Docker
+if (!string.Equals(environment, "Docker", StringComparison.OrdinalIgnoreCase))
+{
+    DotNetEnv.Env.Load();
+}
+
 var routesFolder = Path.Combine(Directory.GetCurrentDirectory(), "Routes");
 var ocelotRoutes = new JArray();
 

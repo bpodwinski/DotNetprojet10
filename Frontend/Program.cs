@@ -53,9 +53,16 @@ builder.Services.AddHttpClient<CustomHttpClient>(client =>
 });
 
 // Configure Data Protection to persist keys securely
+var keysDirectory = "/home/app/.aspnet/DataProtection-Keys";
+if (!Directory.Exists(keysDirectory))
+{
+    throw new Exception($"The directory '{keysDirectory}' does not exist or is not accessible");
+}
+
 builder.Services.AddDataProtection()
-    .PersistKeysToFileSystem(new DirectoryInfo("/keys"))
-    .SetApplicationName("Frontend");
+    .PersistKeysToFileSystem(new DirectoryInfo(keysDirectory))
+    .SetApplicationName("Frontend")
+    .SetDefaultKeyLifetime(TimeSpan.FromDays(90));
 
 // Localization services
 builder.Services.AddLocalization();
