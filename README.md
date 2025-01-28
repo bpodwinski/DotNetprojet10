@@ -16,8 +16,8 @@ Diagramme représentant l'architecture de l'application :
 	Client[Frontend: Blazor Web]  <-->  Ocelot
 ```
 ## Prérequis
-Dotnet 9.0
-Docker 27.4.x : https://www.docker.com/
+- .NET 9.0
+- Docker 27.4.x : https://www.docker.com/
 
 ## Installation
 Installer Docker
