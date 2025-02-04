@@ -102,7 +102,7 @@ services:
       context: .
       dockerfile: Frontend/Dockerfile
     volumes:
-      - frontend-keys:/home/app/.aspnet/DataProtection-Keys
+      - frontend-keys:/keys
     networks:
       - ocp10_network
 
